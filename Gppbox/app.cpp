@@ -106,7 +106,7 @@ int main()
 		while (window.pollEvent(event))//sort un evenement de la liste pour le traiter
 		{
 			ImGui::SFML::ProcessEvent(event);
-			g.processInput(event);
+			g.processEvents(event);
 
 			if (event.type == sf::Event::Resized) {
 				auto nsz = window.getSize();

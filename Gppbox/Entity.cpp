@@ -1,161 +1,303 @@
 #include <imgui.h>
-
 #include "Entity.hpp"
-#include "C.hpp"
 #include "Game.hpp"
+#include "C.hpp"
 
 Entity::Entity(sf::Shape* _spr) : spr(_spr) {
 
 }
 
-void Entity::update(double dt){
-	double rate = 1.0 / dt;
-	double dfr = 60.0f / rate;
 
-	dy += gravy * dt;
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
 
-	dx = dx * pow(frx, dfr);
-	dy = dy * pow(fry, dfr);
 
-	rx += dx * dt;
-	ry += dy * dt;
+// TODO : passer en fixed-update + ajouter les verifs "anti-teleportation" aux mouvement (comme çà c'est clean)
+void Entity::update(double dt)
+{
+	Game& g = *Game::singleton;
+	double rate = 1.0 / dt; // How many times in 1 second (1 second / deltatime)
+	double dfr = C::FRAMERATE / rate; // Normalize rate from framerate
 
-	Game& g = *Game::me;
-	
-	if (rx > 1.0f) {
-		if (! g.hasCollision( cx+rx,cy+ry)) {
-			rx--;
-			cx++;
-		}
-		else {
-			dx = 0;
-			rx = 0.7f;
-		}
+	dy += C::G * gravy * dt; // Apply Gravity
+	dx = dx * pow(frx, dfr); // Apply Friction x
+	dy = dy * pow(fry, dfr); // Apply Friction y
+	float _rx = rx + dx * dt; // Calculate internal movement x
+	float _ry = ry + dy * dt; // Calculate internal movement y
 
-	}
-	if (rx < 0) {
-		if (!g.hasCollision(cx + rx, cy + ry)) {
-			rx++;
-			cx--;
-		}
-		else {
-			dx = 0;
-			rx = 0.3f;
-		}
-	}
+	processHorizontal(g, _rx, _ry);
+	processVertical(g, _rx, _ry);
 
-	if (jumping) {
-		if ((dy > 0) ) {
-			if (g.hasCollision(cx + rx, cy + ry)) {
-				setJumping(false);
-				ry = 0.99f;
-				dy = 0;
-			}
-			else {
-				if(ry > 1) {
-					ry--;
-					cy++;
-				}
-			}
-		}
-
-		if (dy < 0) {
-			while (ry < 0) {
-				ry++;
-				cy--;
-			}
-		}
-	}
-	
+	rx = _rx;
+	ry = _ry;
 	syncPos();
 }
 
-void Entity::setCooPixel(int px, int py){
-	cx = px / C::GRID_SIZE;
-	cy = py / C::GRID_SIZE;
-
-	rx = (px - (cx * C::GRID_SIZE)) / (float)C::GRID_SIZE;
-	ry = (py - (cy * C::GRID_SIZE)) / (float)C::GRID_SIZE;
-
-	syncPos();
-}
-
-void Entity::setCooGrid(float coox, float cooy){
-	cx = (int)coox;
-	rx = coox - cx;
-
-	cy = (int)cooy;
-	ry = cooy - cy;
-	syncPos();
-}
-
-void Entity::syncPos() {
-	sf::Vector2f pos = { (cx + rx) * C::GRID_SIZE, (cy + ry) * C::GRID_SIZE };
-	spr->setPosition(pos);
-}
-
-void Entity::draw(sf::RenderWindow& win){
-	if (spr)
-		win.draw(*spr);
+void Entity::draw(sf::RenderWindow& win)
+{
+	if (spr) win.draw(*spr);
 }
 
 bool Entity::im()
 {
 	using namespace ImGui;
+	bool chg = false, chgCoo = false;
 
-	bool chg = false;
-	
-	Value("jumping", jumping);
+	Value("jumping", isJumping);
 	Value("cx", cx);
 	Value("cy", cy);
-
-	Value("rx",rx);
-	Value("ry",ry);
+	Value("rx", rx);
+	Value("ry", ry);
 
 	sf::Vector2i pix = getPosPixel();
-	chg |= DragInt2("pix x/pix y", &pix.x, 1.0f, -2000,2000);
-	if (chg) 
-		setCooPixel(pix.x, pix.y);
+	chg |= DragInt2("pix x/pix y", &pix.x, 1.0f, -2000, 2000);
+	if (chg) setCooPixel(pix.x, pix.y);
 
 	chg |= DragInt2("cx/cy", &cx, 1.0f, -2000, 2000);
-	
+
 	sf::Vector2f coo = { cx + rx, cy + ry };
-	bool chgCoo = DragFloat2("coo grid x/y", &coo.x, 1.0f, -2000,2000);
-	if (chgCoo) 
-		setCooGrid(coo.x, coo.y);
-	
-	chg |= DragFloat2("dx/dy", &dx, 0.01f, -20,20);
+	chgCoo = DragFloat2("coo grid x/y", &coo.x, 1.0f, -2000, 2000);
+	if (chgCoo) setCooGrid(coo.x, coo.y);
+
+	chg |= DragFloat2("dx/dy", &dx, 0.01f, -20, 20);
 	chg |= DragFloat2("frx/fry", &frx, 0.001f, 0, 1);
 	chg |= DragFloat("gravy/fry", &gravy, 0.001f, -2, 2);
 
 	if (Button("reset")) {
+		chg |= true;
+
 		cx = 3;
 		cy = 54;
 		rx = 0.5f;
 		ry = 0.99f;
 
-		dx = dy = 0;
+		dx = dy = 0.0f;
+		setGrounded(false);
 		setJumping(false);
 	}
-	return chg||chgCoo;
+
+	return chg || chgCoo;
 }
 
-void Entity::setJumping(bool onOff){
-	if (jumping && onOff) 
-		return;
 
-	if (onOff) {
-		gravy = 80;
-		jumping = true;
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+
+
+void Entity::processHorizontal(Game& g, float& _rx, const float& _ry)
+{
+	// No Process Needed
+	if (dx == 0.0f) return;
+
+	float a = _rx;
+
+	// Pre-Process Variables
+	bool isCollision = false;
+	int yposMax(ry - sheight);
+	float xposMax(_rx + swidth), rxMax(rx + swidth);
+	float xposMin(_rx - swidth), rxMin(rx - swidth);
+
+	// Check & Need to process Right
+	if (dx > 0.0f) {
+
+		// Check if need to process collisions
+		if (int(xposMax) > int(rxMax)) {
+			// Check for right collisions // TODO : Ajouter une verif "anti-teleportation" (Normalisée grace au fixed-update)
+			for (float xpos = _rx + cx, xtarget = xposMax + 1 + cx; xpos < xtarget && !isCollision; ++xpos) {
+				for (float ypos = ry + cy, ytarget = yposMax + cy; ypos > ytarget && !isCollision; --ypos)
+					isCollision = g.hasCollision(xpos, ypos);
+			}
+		}
+		
+
+		// Blocked on Right by Collision
+		if (isCollision) {
+			dx = 0; // Cancel Move Speed
+			_rx = rx; // Reset internal position x
+
+		// Process movement on Right
+		} else {
+			// Update internal & full position x
+			int rxi = int(_rx);
+			cx += rxi;
+			_rx -= rxi;
+		}
+
+		// End Horizontal Process
+		return;
 	}
-	else {
-		gravy = 0;
-		jumping = false;
+
+	// Check & Need to process Left
+	if (dx < 0.0f) {
+		
+		// Check if need to process collisions
+		//if (int(xposMin) < int(rxMin)) {
+			// Check for left collisions // TODO : Ajouter une verif "anti-teleportation" (Normalisée grace au fixed-update)
+			for (float xpos = _rx + cx, xtarget = xposMin - 1 + cx; xpos > xtarget && !isCollision; --xpos) {
+				for (float ypos = ry + cy, ytarget = yposMax + cy; ypos > ytarget && !isCollision; --ypos) {
+					isCollision = g.hasCollision(xpos, ypos);
+				}
+			}
+		//}
+
+		// Blocked on Left by Collision
+		if (isCollision) {
+			dx = 0; // Cancel Move Speed
+			_rx = rx; // Reset internal position x
+
+		// Process movement on Left
+		} else if (_rx < 0.0f) {
+			// Update internal & full position x
+			int rxi(_rx);
+			if (_rx - rxi != 0.0f) rxi -= 1;
+			cx += rxi;
+			_rx -= rxi;
+		}
+
+		// End Horizontal Process
+		return;
 	}
+}
+
+
+void Entity::processVertical(Game& g, const float& _rx, float& _ry)
+{
+	// No Process Needed
+	if (dy == 0.0f) return;
+
+	// Pre-Process Variables
+	bool isCollision = false;
+	float xposMin(_rx - swidth);
+	int xposMax(_rx + swidth + 1);
+	float cry(cy + _ry);
+
+	// Check & Need to process Down
+	if (dy > 0.0f && _ry > 1.0f) {
+
+		// Check for down collisions // TODO : Ajouter une verif "anti-teleportation" (Normalisée grace au fixed-update)
+		for (float xpos = xposMin + cx, target = xposMax + cx;
+			xpos < target && !isCollision; ++xpos
+		) isCollision = g.hasCollision(xpos, cry, false);
+
+		// Process Is Grounded
+		if (isCollision) {
+			dy = 0.0f; // Cancel Movement y
+			_ry = 0.99f; // Attach ry to ground
+			setGrounded(true); // Invoke Grounded Callback
+
+		// Process Gravity/Falling
+		} else {
+			// Update internal & full position y
+			int ryi(_ry);
+			cy += ryi;
+			_ry -= ryi;
+		}
+
+		// End Vertical Process
+		return;
+	}
+
+	
+	// Check & Need to process Up
+	if (dy < 0.0f) {
+		// Invoke Grounded Callback
+		setGrounded(false);
+
+		// Check if need to process collisions
+		if (int(_ry - sheight) != int(ry - sheight)) {
+			// Check for up collisions (+ Allow single platform bypass) // TODO : Ajouter une verif "anti-teleportation" (Normalisée grace au fixed-update)
+			for (float xpos = xposMin + cx, xtarget = xposMax + cx, collisionCount = 0; xpos < xtarget && !isCollision; ++xpos) {
+				for (float ypos = cry, ytarget = cry - sheight - 1; ypos > ytarget && !isCollision; --ypos) {
+					if (g.hasCollision(xpos, ypos, false)) {
+						if (++collisionCount > 1) isCollision = true;
+					} else collisionCount = 0;
+				}
+			}
+		}
+
+		// Process se cogne la tete
+		if (isCollision) {
+			dy = 0.0f; // Cancel Movement y
+			_ry = ry; // Reset ry at frame start state
+
+		// Process Jumping/Flying
+		} else if (_ry < 0.0f) {
+			// Update internal & full position y
+			int ryi(_ry);
+			if (_ry - ryi != 0.0f) --ryi;
+			cy += ryi;
+			_ry -= ryi;
+		}
+
+		// End Vertical Process
+		return;
+	}
+}
+
+
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+
+
+void Entity::setCooPixel(int px, int py)
+{
+	cx = px / C::GRID_SIZE;
+	cy = py / C::GRID_SIZE;
+	rx = (px - (cx * C::GRID_SIZE)) / (float)C::GRID_SIZE;
+	ry = (py - (cy * C::GRID_SIZE)) / (float)C::GRID_SIZE;
+	syncPos();
+}
+
+void Entity::setCooGrid(float coox, float cooy)
+{
+	cx = (int)coox;
+	rx = coox - cx;
+	cy = (int)cooy;
+	ry = cooy - cy;
+	syncPos();
+}
+
+void Entity::setGrounded(bool state)
+{
+	// Entity is Grounded
+	if (state) {
+		if (isGrounded) return;
+		isGrounded = true;
+		setJumping(false);
+
+	// Entity isnt Grounded
+	} else {
+		if (!isGrounded) return;
+		isGrounded = false;
+	}
+}
+
+void Entity::setJumping(bool state)
+{
+	if (state) {
+		if (!isGrounded || isJumping) return;
+		isJumping = true;
+		dy -= jumpforce;
+	} else if (isJumping) {
+		isJumping = false;
+	}
+}
+
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+
+
+void Entity::syncPos()
+{
+	sf::Vector2f pos = { (cx + rx) * C::GRID_SIZE, (cy + ry) * C::GRID_SIZE };
+	spr->setPosition(pos);
 }
 
 sf::Vector2i Entity::getPosPixel()
 {
-	return sf::Vector2i( (cx+rx)*C::GRID_SIZE, (cy+ry) * C::GRID_SIZE );
+	return sf::Vector2i((cx+rx) * C::GRID_SIZE, (cy+ry) * C::GRID_SIZE);
 }
-
