@@ -1,13 +1,8 @@
-#include <array>
-#include <vector>
 #include <imgui.h>
-
-#include "C.hpp"
 #include "Game.hpp"
+#include "C.hpp"
 
 Game* Game::singleton = nullptr;
-int Game::cols = C::RES_X / C::GRID_SIZE;
-int Game::lastLine = C::RES_Y / C::GRID_SIZE - 1;
 double Game::g_tickTimer = 0.0;
 double Game::g_time = 0.0;
 
@@ -15,26 +10,28 @@ Game::Game(sf::RenderWindow* win)
 {
 	singleton = this;
 	this->win = win;
-	initBackground();
-	initWalls();
+	world = new World(win);
 	initMainChar();
 }
 
-
-//////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////
-
-
-void Game::initBackground()
+Game::~Game()
 {
-	bool isOk = bgTexture.loadFromFile("res/bg_stars.png");
-	if (!isOk) printf("ERR : LOAD FAILED\n");
-	bgHandle = sf::RectangleShape(Vector2f((float)win->getSize().x, (float)win->getSize().y));
-	bgHandle.setTexture(&bgTexture);
-	bgHandle.setSize(sf::Vector2f(C::RES_X, C::RES_Y));
-	bgShader = new HotReloadShader("res/bg.vert", "res/bg.frag");
+	delete world;
+	for (Entity* e : entities) delete e;
+	entities.clear();
 }
+
+Entity* Game::getPlayer()
+{
+	if (entities.size()) return entities[0];
+	return nullptr;
+}
+
+
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+
 
 void Game::initMainChar() {
 	// Create Player Sprite
@@ -60,33 +57,6 @@ void Game::initMainChar() {
 	printf("player added\n");
 }
 
-void Game::initWalls()
-{
-	for (int i = 0; i < C::RES_X / C::GRID_SIZE; ++i)
-		walls.push_back(Vector2i(i, lastLine));
-
-	walls.push_back(Vector2i(0, lastLine - 1));
-	walls.push_back(Vector2i(0, lastLine - 2));
-	walls.push_back(Vector2i(0, lastLine - 3));
-
-	walls.push_back(Vector2i(cols - 1, lastLine - 1));
-	walls.push_back(Vector2i(cols - 1, lastLine - 2));
-	walls.push_back(Vector2i(cols - 1, lastLine - 3));
-
-
-	walls.push_back(Vector2i(cols >> 2, lastLine - 1));
-	walls.push_back(Vector2i(cols >> 2, lastLine - 2));
-	walls.push_back(Vector2i(cols >> 2, lastLine - 3));
-	walls.push_back(Vector2i(cols >> 2, lastLine - 4));
-
-	walls.push_back(Vector2i((cols >> 2) + 1, lastLine - 4));
-	walls.push_back(Vector2i((cols >> 2) + 1, lastLine - 5));
-	walls.push_back(Vector2i((cols >> 2) + 2, lastLine - 4));
-	walls.push_back(Vector2i((cols >> 2) + 2, lastLine - 5));
-
-	cacheWalls();
-}
-
 
 //////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
@@ -108,8 +78,8 @@ void Game::fixed(double fdt)
 void Game::update(double dt)
 {
 	beforeParts.update(dt);
+	world->update(dt);
 	for (Entity* e : entities) e->update(dt);
-	if (bgShader) bgShader->update(dt);
 	afterParts.update(dt);
 }
 
@@ -119,42 +89,26 @@ void Game::update(double dt)
 //////////////////////////////////////////////////////////////////
 
 
- void Game::draw(sf::RenderWindow& win)
- {
-	// Draw Background
-	sf::RenderStates states = sf::RenderStates::Default;
-	sf::Shader * sh = &bgShader->sh;
-	states.blendMode = sf::BlendAdd;
-	states.shader = sh;
-	states.texture = &bgTexture;
-	sh->setUniform("texture", bgTexture);
-	win.draw(bgHandle, states);
-
-	// Draw Parts, Walls, and Entities
+void Game::draw(sf::RenderWindow& win)
+{
+	// Draw Parts and Entities
 	beforeParts.draw(win);
-	for (sf::RectangleShape& r : wallSprites) win.draw(r);
+	world->draw(win);
 	for (Entity* e : entities) e->draw(win);
 	afterParts.draw(win);
 }
 
- void Game::im()
+ void Game::imgui()
  {
 	using namespace ImGui;
-
-	// Show Walls for debug
-	if (TreeNodeEx("Walls", 0)) {
-		for (Vector2i& w : walls) {
-			Value("x",w.x);
-			Value("y",w.y);
-		}
-		TreePop();
-	}
-
+	
 	// Show Entities for debug
-	if (TreeNodeEx("Entities", ImGuiTreeNodeFlags_DefaultOpen)) {
-		for (Entity* e : entities) e->im();
-		TreePop();
+	if (CollapsingHeader("Entities")) {
+		for (Entity* e : entities) e->imgui();
 	}
+
+	// World Imgui
+	world->imgui();
 }
 
 
@@ -177,8 +131,7 @@ void Game::processEvents(sf::Event ev)
 
 		// Key [K] for walls reset debug
 		if (ev.key.code == Keyboard::K) {
-			walls.clear();
-			cacheWalls();
+			world->debug();
 			return;
 		}
 	}
@@ -220,21 +173,27 @@ void Game::processInputs(double dt)
 //////////////////////////////////////////////////////////////////
 
 
-Entity* Game::getPlayer()
+// Full check for Occupied Space
+bool Game::isOccupied(int gridx, int gridy)
 {
-	if (entities.size()) return entities[0];
-	return nullptr;
+	return isPlayer(gridx, gridy) ||
+		isEnnemy(gridx, gridy) ||
+		isWall(gridx, gridy);
 }
 
-// Cache Walls to Graphics
-void Game::cacheWalls() {
-	wallSprites.clear();
-	for (Vector2i& w : walls) {
-		sf::RectangleShape rect(Vector2f(16, 16));
-		rect.setPosition((float)w.x * C::GRID_SIZE, (float)w.y * C::GRID_SIZE);
-		rect.setFillColor(sf::Color(0x07ff07ff));
-		wallSprites.push_back(rect);
-	}
+// Check is player is at coordinates
+bool Game::isPlayer(int gridx, int gridy)
+{
+	Entity* player = getPlayer();
+	if (!player) return false;
+	return player->cx == gridx && player->cy == gridy;
+}
+
+// Check if there is an ennemy at coordinates
+bool Game::isEnnemy(int gridx, int gridy)
+{
+	// TODO : Implement
+	return false;
 }
 
 
@@ -260,7 +219,7 @@ bool Game::isBorderX(float gridx)
 // Check if there is a Wall (Collision) at this position
 bool Game::isWall(int cx, int cy)
 {
-	for (Vector2i& w : walls) {
+	for (Vector2i& w : world->walls) {
 		if (w.x == cx && w.y == cy)
 			return true;
 	}

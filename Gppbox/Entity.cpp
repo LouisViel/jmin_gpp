@@ -61,7 +61,7 @@ void Entity::draw(sf::RenderWindow& win)
 	if (spr) win.draw(*spr);
 }
 
-bool Entity::im()
+bool Entity::imgui()
 {
 	using namespace ImGui;
 	bool chg = false, chgCoo = false;

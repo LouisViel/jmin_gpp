@@ -40,7 +40,7 @@ public:
 	void fixed(double fdt); // Fixed Update Entity
 	void update(double dt); // Update Entity
 	void draw(sf::RenderWindow& win); // Graphics Drawing
-	bool im(); // Imgui Drawing
+	bool imgui(); // Imgui Drawing
 	
 	void processHorizontal(Game& g, float& _rx, const float& _ry);
 	void processVertical(Game& g, const float& _rx, float& _ry);

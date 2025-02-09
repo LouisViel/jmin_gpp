@@ -6,6 +6,8 @@ namespace C
 	static constexpr float F_REF = 60.0f; // Framerate Processing Reference
 	static constexpr double F_FIXED = 1.0f / 50.0f; // Framerate for Fixed Update
 	static constexpr float F_TARGET = 60.0f; // 60.0f // App Target Framerate
+	static constexpr std::string_view SAVE_FILE = "gamemap.save";
+	static constexpr std::string_view SAVE_SPLIT = "--\n";
 
 	// Game Constants
 	static constexpr int GRID_SIZE = 16;
@@ -15,7 +17,7 @@ namespace C
 	// Entities Constants
 	static constexpr float G = 9.81f * 11; // (positif = down, negatif = up)
 	static constexpr double E_MAX_X = 30.0f; // Max x speed
-	static constexpr double E_MAX_Y = 60.0f; // Max y Speed
+	static constexpr double E_MAX_Y = 49.0f; // Max y Speed
 	static constexpr float E_FR_GROUND = 1.45f; // Friction Ground multiplier
 
 	// Sprite/Rendering Constants
