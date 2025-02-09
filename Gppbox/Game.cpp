@@ -38,13 +38,11 @@ void Game::initBackground()
 
 void Game::initMainChar() {
 	// Create Player Sprite
-	sf::RectangleShape* spr = new sf::RectangleShape({ C::GRID_SIZE, C::GRID_SIZE * 2 });
+	sf::RectangleShape* spr = new sf::RectangleShape({ C::GRID_SIZE * C::S_SCALER_X, C::GRID_SIZE * 2 * C::S_SCALER_Y });
 	spr->setFillColor(sf::Color::Magenta);
 	spr->setOutlineColor(sf::Color::Red);
 	spr->setOutlineThickness(2);
-	//spr->setOrigin({ C::GRID_SIZE, C::GRID_SIZE }); // TODO : Resoudre ce soucis de de-synchro entre sprite et physics (origin/graphics wrong ??)
-	//spr->setOrigin({ C::GRID_SIZE * 0.5f, C::GRID_SIZE * 2 });
-	//spr->setOrigin({ C::P_WIDTH, C::P_HEIGHT });
+	spr->setOrigin({ C::GRID_SIZE * 0.5f, C::GRID_SIZE * 2 });
 
 	// Create Player with "default" settings
 	Entity* e = new Entity(spr);
@@ -95,22 +93,34 @@ void Game::initWalls()
 //////////////////////////////////////////////////////////////////
 
 
+void Game::preupdate(double dt)
+{
+	g_time += dt;
+	for (Entity* e : entities) e->preupdate(dt);
+	processInputs(dt);
+}
+
+void Game::fixed(double fdt)
+{
+	for (Entity* e : entities) e->fixed(fdt);
+}
+
 void Game::update(double dt)
 {
-	processInputs(dt);
-	g_time += dt;
-
 	beforeParts.update(dt);
 	for (Entity* e : entities) e->update(dt);
 	if (bgShader) bgShader->update(dt);
 	afterParts.update(dt);
 }
 
+
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+
+
  void Game::draw(sf::RenderWindow& win)
  {
-	 // No need to run
-	if (closing) return;
-
 	// Draw Background
 	sf::RenderStates states = sf::RenderStates::Default;
 	sf::Shader * sh = &bgShader->sh;
@@ -129,8 +139,6 @@ void Game::update(double dt)
 
  void Game::im()
  {
-	 // No need to run
-	if (closing) return;
 	using namespace ImGui;
 
 	// Show Walls for debug
@@ -178,14 +186,11 @@ void Game::processEvents(sf::Event ev)
 
 void Game::processInputs(double dt)
 {
-	float lateralSpeed = 8.0;
-	float maxSpeed = 40.0;
-
 	// Process Left Movement Input
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Q)) {
 		Entity* mainChar = getPlayer();
 		if (mainChar) {
-			mainChar->dx -= mainChar->speed;
+			mainChar->setDx(mainChar->dx - mainChar->speed * dt);
 		}
 	}
 
@@ -193,17 +198,17 @@ void Game::processInputs(double dt)
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
 		Entity* mainChar = getPlayer();
 		if (mainChar) {
-			mainChar->dx += mainChar->speed;
+			mainChar->setDx(mainChar->dx + mainChar->speed * dt);
 		}
 	}
 
 	// Process Jump Input
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space)) {
-		if (!wasSpacePressed) {
+		//if (!wasSpacePressed) {
 			Entity* mainChar = getPlayer();
 			if (mainChar) mainChar->setJumping(true);
 			wasSpacePressed = true;
-		}
+		//}
 	} else {
 		wasSpacePressed = false;
 	}
@@ -249,7 +254,7 @@ bool Game::hasCollision(float gridx, float gridy, bool checkBorder)
 bool Game::isBorderX(float gridx)
 {
 	int wallRightX = (C::RES_X / C::GRID_SIZE) - 1;
-	return gridx < 1.5f || gridx >= wallRightX;
+	return gridx < 1.0f || gridx >= wallRightX;
 }
 
 // Check if there is a Wall (Collision) at this position

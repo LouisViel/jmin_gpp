@@ -45,7 +45,7 @@ int main()
     //sf::RenderWindow window(sf::VideoMode(800, 600,32), "SFML works!");
     //sf::RenderWindow window(sf::VideoMode(1280, 720,32), "SFML works!");
 	window.setVerticalSyncEnabled(true);
-	window.setFramerateLimit(60);
+	window.setFramerateLimit(C::F_TARGET);
 	Font font;
 
     if (!font.loadFromFile("res/MAIAN.TTF")) {
@@ -74,6 +74,7 @@ int main()
 	fpsCounter.setFont(font);
 	fpsCounter.setString("FPS:");
 
+	double frameRemain = 0.0f;
 	double frameStart = 0.0;
 	double frameEnd = 0.0;
 
@@ -108,6 +109,7 @@ int main()
 			ImGui::SFML::ProcessEvent(event);
 			g.processEvents(event);
 
+			if (event.type == sf::Event::Closed) break;
 			if (event.type == sf::Event::Resized) {
 				auto nsz = window.getSize();
 				winTex.create(window.getSize().x, window.getSize().y);
@@ -123,8 +125,19 @@ int main()
 			}
 		}
 
+		// Break loop if closing window
+		if (g.closing) break;
+
 		//don't use imgui before this;
 		ImGui::SFML::Update(window, sf::seconds((float)dt));
+
+		g.preupdate(dt);
+
+		frameRemain += dt;
+		while (frameRemain > C::F_FIXED) {
+			frameRemain -= C::F_FIXED;
+			g.fixed(C::F_FIXED);
+		}
 
         g.update(dt);
 		
@@ -156,8 +169,8 @@ int main()
 			ImGui::ColorEdit4("bloomMul", &bloomMul.x);
 			ImGui::ColorEdit4("bloomMul2", &bloomMul.x);
 		}
-		g.im();
 
+		g.im();
         g.draw(window);
 
 		window.draw(fpsCounter);

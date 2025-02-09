@@ -9,7 +9,7 @@ namespace sf {
 
 class Entity{
 public:
-	sf::Shape* spr = 0; // Pointeur vers le sprite lié
+	sf::Shape* spr = nullptr; // Pointeur vers le sprite lié
 	float sheight = 0.0f; // Sprite height (center at bottom)
 	float swidth = 0.0f; // Sprite width (center at middle)
 
@@ -22,7 +22,7 @@ public:
 	float dy = 0.0f; // Entity Movement Speed en y
 	float gravy = 1.0f; // Entity Gravity multiplier
 
-	float frx = 0.88f; // Friction en x
+	float frx = 0.84f; // Friction en x
 	float fry = 1.0f; // Friction en y
 
 	float speed = 1.0f; // Move Speed (x axis)
@@ -30,10 +30,14 @@ public:
 
 	bool isJumping = false; // Is Entity Jumping
 	bool isGrounded = false; // Is Entity Grounded
+	float coyoteeTime = 0.0f;
+	float jumpDelay = 0.0f;
 
 
 	Entity(sf::Shape* spr); // Entity Constructor
 
+	void preupdate(double dt); // Pre Update Entity
+	void fixed(double fdt); // Fixed Update Entity
 	void update(double dt); // Update Entity
 	void draw(sf::RenderWindow& win); // Graphics Drawing
 	bool im(); // Imgui Drawing
@@ -46,7 +50,10 @@ public:
 
 	void setGrounded(bool state); // Grounded callback
 	void setJumping(bool state); // Set Jumping state
+	inline bool canJump() const;
 
+	void setDx(double dx); // Set dx (using clamp)
+	void setDy(double dy); // Set dy (using clamp)
 	void syncPos(); // Sync Sprite position with internal position
 	sf::Vector2i getPosPixel(); // Get Coordinate (Using Screen as referencial)
 };

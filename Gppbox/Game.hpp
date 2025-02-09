@@ -44,6 +44,8 @@ public:
 	void initMainChar();
 	void initWalls();
 
+	void preupdate(double dt);
+	void fixed(double fdt);
 	void update(double dt);
 	void draw(sf::RenderWindow& win);
 	void im();

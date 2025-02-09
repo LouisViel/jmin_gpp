@@ -13,26 +13,48 @@ Entity::Entity(sf::Shape* _spr) : spr(_spr) {
 //////////////////////////////////////////////////////////////////
 
 
-// TODO : passer en fixed-update + ajouter les verifs "anti-teleportation" aux mouvement (comme за c'est clean)
-void Entity::update(double dt)
+void Entity::preupdate(double dt)
+{
+	// Update Coyotee Timer
+	if (!isGrounded && coyoteeTime > 0.0f) {
+		coyoteeTime -= dt;
+	}
+
+	// Update Jump Delay Timer
+	if (jumpDelay > 0.0f) {
+		jumpDelay -= dt;
+	}
+}
+
+void Entity::fixed(double fdt)
 {
 	Game& g = *Game::singleton;
-	double rate = 1.0 / dt; // How many times in 1 second (1 second / deltatime)
-	double dfr = C::FRAMERATE / rate; // Normalize rate from framerate
+	double rate = 1.0 / fdt; // How many times in 1 second (1 second / deltatime)
+	double dfr = C::F_REF / rate; // Normalize rate from framerate
 
-	dy += C::G * gravy * dt; // Apply Gravity
-	dx = dx * pow(frx, dfr); // Apply Friction x
-	dy = dy * pow(fry, dfr); // Apply Friction y
-	float _rx = rx + dx * dt; // Calculate internal movement x
-	float _ry = ry + dy * dt; // Calculate internal movement y
+	float frxdfr = isGrounded ? dfr * C::E_FR_GROUND : dfr;
+	setDy(dy + C::G * gravy * fdt); // Apply Gravity
+	dx *= pow(frx, frxdfr); // Apply Friction x
+	dy *= pow(fry, dfr); // Apply Friction y
 
+	float _rx = rx + dx * fdt; // Calculate internal movement x
+	float _ry = ry + dy * fdt; // Calculate internal movement y
 	processHorizontal(g, _rx, _ry);
 	processVertical(g, _rx, _ry);
-
 	rx = _rx;
 	ry = _ry;
+}
+
+void Entity::update(double dt)
+{
 	syncPos();
 }
+
+
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+
 
 void Entity::draw(sf::RenderWindow& win)
 {
@@ -45,6 +67,8 @@ bool Entity::im()
 	bool chg = false, chgCoo = false;
 
 	Value("jumping", isJumping);
+	Value("grounded", isGrounded);
+	Value("coyotee", coyoteeTime);
 	Value("cx", cx);
 	Value("cy", cy);
 	Value("rx", rx);
@@ -161,7 +185,6 @@ void Entity::processHorizontal(Game& g, float& _rx, const float& _ry)
 	}
 }
 
-
 void Entity::processVertical(Game& g, const float& _rx, float& _ry)
 {
 	// No Process Needed
@@ -185,7 +208,6 @@ void Entity::processVertical(Game& g, const float& _rx, float& _ry)
 		if (isCollision) {
 			dy = 0.0f; // Cancel Movement y
 			_ry = 0.99f; // Attach ry to ground
-			setGrounded(true); // Invoke Grounded Callback
 
 		// Process Gravity/Falling
 		} else {
@@ -194,6 +216,14 @@ void Entity::processVertical(Game& g, const float& _rx, float& _ry)
 			cy += ryi;
 			_ry -= ryi;
 		}
+
+		// Furtherprocess is Grounded (allowing bit of tolerance)
+		bool _isGrounded = isCollision;
+		for (float ypos = cry + 1.0f, ytarget = ypos + C::P_JUMP_TOL; !_isGrounded && ypos < ytarget; ++ypos) {
+			for (float xpos = xposMin + cx, target = xposMax + cx; xpos < target && !_isGrounded; ++xpos) 
+				_isGrounded = g.hasCollision(xpos, ypos, false);
+		}
+		setGrounded(_isGrounded);
 
 		// End Vertical Process
 		return;
@@ -266,6 +296,8 @@ void Entity::setGrounded(bool state)
 	if (state) {
 		if (isGrounded) return;
 		isGrounded = true;
+		coyoteeTime = C::P_COYOTEE;
+		jumpDelay = C::P_JUMPD;
 		setJumping(false);
 
 	// Entity isnt Grounded
@@ -277,24 +309,45 @@ void Entity::setGrounded(bool state)
 
 void Entity::setJumping(bool state)
 {
+	// Entity is Jumping
 	if (state) {
-		if (!isGrounded || isJumping) return;
+		if (!canJump()) return;
 		isJumping = true;
-		dy -= jumpforce;
+		coyoteeTime = 0.0f;
+		setDy(-jumpforce);
+
+	// Entity isnt Jumping
 	} else if (isJumping) {
 		isJumping = false;
 	}
+}
+
+inline bool Entity::canJump() const
+{
+	// !isGrounded || isJumping
+	return jumpDelay <= 0.0f && coyoteeTime > 0.0f;
 }
 
 //////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
 
+void Entity::setDx(double dx)
+{
+	this->dx = clamp(dx, -C::E_MAX_X, C::E_MAX_X);
+}
+
+void Entity::setDy(double dy)
+{
+	this->dy = clamp(dy, -C::E_MAX_Y, C::E_MAX_Y);
+}
 
 void Entity::syncPos()
 {
-	sf::Vector2f pos = { (cx + rx) * C::GRID_SIZE, (cy + ry) * C::GRID_SIZE };
-	spr->setPosition(pos);
+	spr->setPosition(sf::Vector2f {
+		(cx + rx) * C::GRID_SIZE - C::S_ADJUSTMENT_X,
+		(cy + ry) * C::GRID_SIZE - C::S_ADJUSTMENT_Y
+	});
 }
 
 sf::Vector2i Entity::getPosPixel()
