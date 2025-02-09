@@ -26,7 +26,6 @@ public:
 	~World();
 	World(sf::RenderWindow* win);
 	void initBackground();
-	void initWalls();
 
 	void update(double dt);
 	void draw(sf::RenderWindow& win);

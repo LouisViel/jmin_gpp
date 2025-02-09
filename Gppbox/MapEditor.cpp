@@ -39,12 +39,15 @@ void MapEditor::update(double dt)
 	rightButton = sf::Mouse::isButtonPressed(sf::Mouse::Right);
 
 	// Check if target is occupied
-	occupied = Game::singleton->isOccupied(mousePos.x, mousePos.y);
-	
+	Game* g = Game::singleton;
+	occupied = g->isOccupied(mousePos.x, mousePos.y);
+
 	// Destroy Object if asked to + occupied
 	if (occupied && rightButton) {
-		removeAny();
-		occupied = false;
+		if (!g->isPlayer(mousePos.x, mousePos.y)) {
+			removeAny();
+			occupied = false;
+		}
 	}
 
 	// Spawn Object if asked to + not occupied 
@@ -78,7 +81,6 @@ void MapEditor::imgui()
 	if (TreeNodeEx("Editor", ImGuiTreeNodeFlags_DefaultOpen)) {
 
 		// Load / Save / Reset Buttons
-		Dummy(ImVec2(0.0f, 3.0f));
 		ImGui::Text("Save Settings :");
 		if (Button("Load Map")) load();
 		SameLine();

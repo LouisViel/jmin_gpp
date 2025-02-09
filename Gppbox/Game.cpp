@@ -184,9 +184,24 @@ bool Game::isOccupied(int gridx, int gridy)
 // Check is player is at coordinates
 bool Game::isPlayer(int gridx, int gridy)
 {
+	// Get Player
 	Entity* player = getPlayer();
 	if (!player) return false;
-	return player->cx == gridx && player->cy == gridy;
+
+	// Prepare full check Variables
+	float xposMin(player->rx - player->swidth + player->cx);
+	float xposMax(player->rx + player->swidth + 1 + player->cx);
+	float cry(player->cy + player->ry);
+
+	// Process full body check
+	for (float ypos = cry, ytarget = cry - player->sheight; ypos > ytarget; --ypos) {
+		for (float xpos = xposMin; xpos < xposMax; ++xpos) {
+			if (int(xpos) == gridx && int(ypos) == gridy) return true;
+		}
+	}
+
+	// Player was not here
+	return false;
 }
 
 // Check if there is an ennemy at coordinates
