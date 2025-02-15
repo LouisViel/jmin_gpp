@@ -45,13 +45,14 @@ void Entity::addComponents(Component** components, int componentCount)
 
 void Entity::preupdate(double dt)
 {
+	hcollision = 0; // Reset Horizontal collision tag
 	for (Component* c : *components) c->preupdate(dt);
 }
 
 void Entity::fixed(double fdt)
 {
-	for (Component* c : *components) c->fixed(fdt);
 	processMovement(fdt);
+	for (Component* c : *components) c->fixed(fdt);
 }
 
 void Entity::update(double dt)
@@ -143,8 +144,6 @@ void Entity::processHorizontal(Game& g, float& _rx, const float& _ry)
 	// No Process Needed
 	if (dx == 0.0f) return;
 
-	float a = _rx;
-
 	// Pre-Process Variables
 	bool isCollision = false;
 	int yposMax(ry - sheight);
@@ -168,6 +167,7 @@ void Entity::processHorizontal(Game& g, float& _rx, const float& _ry)
 		if (isCollision) {
 			dx = 0; // Cancel Move Speed
 			_rx = rx; // Reset internal position x
+			hcollision = 1;
 
 		// Process movement on Right
 		} else {
@@ -198,6 +198,7 @@ void Entity::processHorizontal(Game& g, float& _rx, const float& _ry)
 		if (isCollision) {
 			dx = 0; // Cancel Move Speed
 			_rx = rx; // Reset internal position x
+			hcollision = -1;
 
 		// Process movement on Left
 		} else if (_rx < 0.0f) {

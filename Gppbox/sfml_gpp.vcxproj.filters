@@ -16,6 +16,12 @@
     <Filter Include="imgui">
       <UniqueIdentifier>{53306db3-d643-46e4-a343-031b5fd5c07f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Fichiers sources\Components">
+      <UniqueIdentifier>{88400390-27d2-4054-9c1f-3c0d2b89ea7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\Components">
+      <UniqueIdentifier>{db7e0a42-a3b2-41c0-939f-74289dba9886}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp">
@@ -63,8 +69,11 @@
     <ClCompile Include="InputHandler.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
+    <ClCompile Include="EnnemyController.cpp">
+      <Filter>Fichiers sources\Components</Filter>
+    </ClCompile>
     <ClCompile Include="PlayerController.cpp">
-      <Filter>Fichiers sources</Filter>
+      <Filter>Fichiers sources\Components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -123,7 +132,10 @@
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="PlayerController.hpp">
-      <Filter>Fichiers d%27en-tête</Filter>
+      <Filter>Fichiers d%27en-tête\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="EnnemyController.hpp">
+      <Filter>Fichiers d%27en-tête\Components</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

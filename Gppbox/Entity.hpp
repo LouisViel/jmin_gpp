@@ -33,11 +33,12 @@ public:
 
 	bool isJumping = false; // Is Entity Jumping
 	bool isGrounded = false; // Is Entity Grounded
+	int hcollision = 0; // Horizontal Collision : -1 = left, 0 = none, 1 = right
 
 
 	Entity(sf::Shape* spr); // Entity Constructor, no components
 	Entity(sf::Shape* spr, Component** components, int componentCount); // Entity Constructor
-	~Entity(); // ENtity Destructor
+	~Entity(); // Entity Destructor
 
 	void addComponent(Component* component); // Add one component
 	void addComponents(Component** components, int componentCount); // Add multiple components

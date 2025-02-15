@@ -1,6 +1,7 @@
 #include <imgui.h>
 #include "Game.hpp"
 #include "PlayerController.hpp"
+#include "EnnemyController.hpp"
 #include "C.hpp"
 
 Game* Game::singleton = nullptr;
@@ -13,6 +14,7 @@ Game::Game(sf::RenderWindow* win)
 	this->win = win;
 	world = new World(win);
 	initMainChar();
+	initEnnemies();
 }
 
 Game::~Game()
@@ -57,6 +59,32 @@ void Game::initMainChar() {
 
 	entities.push_back(e);
 	printf("player added\n");
+}
+
+void Game::initEnnemies()
+{
+	// Create Ennemy Sprite
+	sf::RectangleShape* spr = new sf::RectangleShape({ C::GRID_SIZE * C::S_SCALER_X, C::GRID_SIZE * 2 * C::S_SCALER_Y });
+	spr->setFillColor(sf::Color::Yellow);
+	spr->setOutlineColor(sf::Color::Red);
+	spr->setOutlineThickness(2);
+	spr->setOrigin({ C::GRID_SIZE * 0.5f, C::GRID_SIZE * 2 });
+
+	// Create Ennemy with "default" settings
+	Entity* e = new Entity(spr);
+	e->addComponent(new EnnemyController(e));
+	e->setCooGrid(7, int(C::RES_Y / C::GRID_SIZE) - 4);
+	e->ry = 0.99f;
+	e->syncPos();
+
+	// Inject Custom Ennemy Settings
+	e->sheight = C::P_HEIGHT;
+	e->swidth = C::P_WIDTH;
+	e->speed = C::P_SPEED;
+	e->jumpforce = C::P_JUMP;
+
+	entities.push_back(e);
+	printf("ennemy added\n");
 }
 
 

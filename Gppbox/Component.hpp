@@ -14,13 +14,13 @@ public:
 	Component() = delete;
 	Component(Entity* _entity) : entity(_entity) { }
 
-	virtual void preupdate(double dt) = 0; // Pre Update
-	virtual void fixed(double fdt) = 0; // Fixed Update
-	virtual void update(double dt) = 0; // Update
-	virtual void draw(sf::RenderWindow& win) = 0; // Graphics Drawing
-	virtual bool imgui() = 0; // Imgui Drawing
+	virtual void preupdate(double dt) { } // Pre Update
+	virtual void fixed(double fdt) { } // Fixed Update
+	virtual void update(double dt) { } // Update
+	virtual void draw(sf::RenderWindow& win) { } // Graphics Drawing
+	virtual bool imgui() { return false; } // Imgui Drawing
 
-	virtual void onGrounded(bool state) { };
-	virtual void onJumping(bool state) { };
+	virtual void onGrounded(bool state) { }
+	virtual void onJumping(bool state) { }
 	virtual bool canJump() { return true; }
 };

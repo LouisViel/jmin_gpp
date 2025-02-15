@@ -32,8 +32,10 @@ public:
 	
 	~Game();
 	Game(sf::RenderWindow * win);
-	void initMainChar();
+
 	Entity* getPlayer();
+	void initMainChar();
+	void initEnnemies();
 
 	void preupdate(double dt);
 	void fixed(double fdt);
