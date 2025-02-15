@@ -1,5 +1,6 @@
 #include <imgui.h>
 #include "Game.hpp"
+#include "PlayerController.hpp"
 #include "C.hpp"
 
 Game* Game::singleton = nullptr;
@@ -43,6 +44,7 @@ void Game::initMainChar() {
 
 	// Create Player with "default" settings
 	Entity* e = new Entity(spr);
+	e->addComponent(new PlayerController(e));
 	e->setCooGrid(3, int(C::RES_Y / C::GRID_SIZE) - 4);
 	e->ry = 0.99f;
 	e->syncPos();

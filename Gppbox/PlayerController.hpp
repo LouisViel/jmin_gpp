@@ -1,6 +1,5 @@
 #pragma once
 #include "Component.hpp"
-#include "Entity.hpp"
 
 class PlayerController : public Component
 {
@@ -12,4 +11,12 @@ public:
 	void update(double dt) override;
 	void draw(sf::RenderWindow& win) override;
 	bool imgui() override;
+
+	void onGrounded(bool state) override;
+	void onJumping(bool state) override;
+	bool canJump() override;
+
+private:
+	float coyoteeTime = 0.0f;
+	float jumpDelay = 0.0f;
 };

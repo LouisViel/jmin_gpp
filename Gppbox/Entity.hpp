@@ -11,7 +11,7 @@ namespace sf {
 
 class Entity {
 public:
-	std::vector<Component*> components;
+	std::vector<Component*>* components = nullptr;
 	sf::Shape* spr = nullptr; // Pointeur vers le sprite lié
 	float sheight = 0.0f; // Sprite height (center at bottom)
 	float swidth = 0.0f; // Sprite width (center at middle)
@@ -33,12 +33,14 @@ public:
 
 	bool isJumping = false; // Is Entity Jumping
 	bool isGrounded = false; // Is Entity Grounded
-	float coyoteeTime = 0.0f;
-	float jumpDelay = 0.0f;
 
 
-	Entity(sf::Shape* spr); // Entity Constructor
-	~Entity();
+	Entity(sf::Shape* spr); // Entity Constructor, no components
+	Entity(sf::Shape* spr, Component** components, int componentCount); // Entity Constructor
+	~Entity(); // ENtity Destructor
+
+	void addComponent(Component* component); // Add one component
+	void addComponents(Component** components, int componentCount); // Add multiple components
 
 	void preupdate(double dt); // Pre Update Entity
 	void fixed(double fdt); // Fixed Update Entity
@@ -46,16 +48,16 @@ public:
 	void draw(sf::RenderWindow& win); // Graphics Drawing
 	bool imgui(); // Imgui Drawing
 	
-	inline void processMovement(double fdt);
-	void processHorizontal(Game& g, float& _rx, const float& _ry);
-	void processVertical(Game& g, const float& _rx, float& _ry);
+	inline void processMovement(double fdt); // Process Entity Full Movement
+	void processHorizontal(Game& g, float& _rx, const float& _ry); // Internal Process Movement Horizontal
+	void processVertical(Game& g, const float& _rx, float& _ry); // Internal Process Movement Vertical
 
 	void setCooPixel(int px, int py); // Set Coordinate (Using Screen as referencial)
 	void setCooGrid(float coox, float cooy); // Set Coordinate (Using Grid as referencial)
 
 	void setGrounded(bool state); // Grounded callback
 	void setJumping(bool state); // Set Jumping state
-	inline bool canJump() const;
+	bool canJump() const; // Check if can Jump
 
 	void setDx(double dx); // Set dx (using clamp)
 	void setDy(double dy); // Set dy (using clamp)

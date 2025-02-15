@@ -1,6 +1,5 @@
 #include <imgui.h>
 #include "World.hpp"
-#include "Game.hpp";
 #include "C.hpp"
 
 
@@ -73,7 +72,7 @@ void World::imgui()
 
 		// Draw Debug Walls
 		if (TreeNodeEx("Walls")) {
-			for (Vector2i& w : walls) {
+			for (sf::Vector2i& w : walls) {
 				Value("x", w.x);
 				Value("y", w.y);
 			}

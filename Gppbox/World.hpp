@@ -1,14 +1,8 @@
 #pragma once
 
 #include <vector>
-
-#include "SFML/Graphics.hpp"
-#include "SFML/System.hpp"
-#include "SFML/Window.hpp"
-
-#include "MapEditor.hpp"
 #include "HotReloadShader.hpp"
-#include "Particle.hpp"
+#include "MapEditor.hpp"
 
 class World
 {

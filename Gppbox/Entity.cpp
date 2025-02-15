@@ -4,16 +4,37 @@
 #include "Game.hpp"
 #include "C.hpp"
 
-Entity::Entity(sf::Shape* _spr, Component** componnents) : spr(_spr)
+Entity::Entity(sf::Shape* spr) : Entity(spr, nullptr, 0) { }
+
+Entity::Entity(sf::Shape* _spr, Component** components, int componentCount) : spr(_spr)
 {
-	//this->components = std::vector<Component*>()
+	if (components == nullptr) this->components = new std::vector<Component*>();
+	else this->components = new std::vector<Component*>(components, components + componentCount);
 }
 
 Entity::~Entity()
 {
 	delete spr;
-	for (Component* c : components) delete c;
-	components.clear();
+	for (Component* c : *components) delete c;
+	delete components;
+}
+
+
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+
+
+void Entity::addComponent(Component* component)
+{
+	if (component == nullptr) return;
+	this->components->push_back(component);
+}
+
+void Entity::addComponents(Component** components, int componentCount)
+{
+	if (components == nullptr || componentCount <= 0) return;
+	this->components->insert(this->components->end(), components, components + componentCount);
 }
 
 
@@ -24,30 +45,18 @@ Entity::~Entity()
 
 void Entity::preupdate(double dt)
 {
-	for (Component* c : components) c->preupdate(dt);
-	
-	// TODO : Move things below to PlayerController
-
-	// Update Coyotee Timer
-	if (!isGrounded && coyoteeTime > 0.0f) {
-		coyoteeTime -= dt;
-	}
-
-	// Update Jump Delay Timer
-	if (jumpDelay > 0.0f) {
-		jumpDelay -= dt;
-	}
+	for (Component* c : *components) c->preupdate(dt);
 }
 
 void Entity::fixed(double fdt)
 {
-	for (Component* c : components) c->fixed(fdt);
+	for (Component* c : *components) c->fixed(fdt);
 	processMovement(fdt);
 }
 
 void Entity::update(double dt)
 {
-	for (Component* c : components) c->update(dt);
+	for (Component* c : *components) c->update(dt);
 	syncPos();
 }
 
@@ -69,7 +78,6 @@ bool Entity::imgui()
 
 	Value("jumping", isJumping);
 	Value("grounded", isGrounded);
-	Value("coyotee", coyoteeTime);
 	Value("cx", cx);
 	Value("cy", cy);
 	Value("rx", rx);
@@ -310,14 +318,18 @@ void Entity::setCooGrid(float coox, float cooy)
 	syncPos();
 }
 
+
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+
+
 void Entity::setGrounded(bool state)
 {
 	// Entity is Grounded
 	if (state) {
 		if (isGrounded) return;
 		isGrounded = true;
-		coyoteeTime = C::P_COYOTEE;
-		jumpDelay = C::P_JUMPD;
 		setJumping(false);
 
 	// Entity isnt Grounded
@@ -325,6 +337,9 @@ void Entity::setGrounded(bool state)
 		if (!isGrounded) return;
 		isGrounded = false;
 	}
+
+	// Call On Jumping Callbacks
+	for (Component* c : *components) c->onGrounded(isGrounded);
 }
 
 void Entity::setJumping(bool state)
@@ -333,24 +348,33 @@ void Entity::setJumping(bool state)
 	if (state) {
 		if (!canJump()) return;
 		isJumping = true;
-		coyoteeTime = 0.0f;
 		setDy(-jumpforce);
 
 	// Entity isnt Jumping
 	} else if (isJumping) {
 		isJumping = false;
-	}
+
+	// No more processing
+	} else return;
+
+	// Call On Jumping Callbacks
+	for (Component* c : *components) c->onJumping(isJumping);
 }
 
-inline bool Entity::canJump() const
+bool Entity::canJump() const
 {
-	// !isGrounded || isJumping
-	return jumpDelay <= 0.0f && coyoteeTime > 0.0f;
+	// Can Jump only if all components allow it
+	for (Component* c : *components) {
+		if (!c->canJump()) return false;
+	}
+	return true;
 }
+
 
 //////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
+
 
 void Entity::setDx(double dx)
 {
@@ -372,5 +396,5 @@ void Entity::syncPos()
 
 sf::Vector2i Entity::getPosPixel()
 {
-	return sf::Vector2i((cx+rx) * C::GRID_SIZE, (cy+ry) * C::GRID_SIZE);
+	return sf::Vector2i((cx + rx) * C::GRID_SIZE, (cy + ry) * C::GRID_SIZE);
 }

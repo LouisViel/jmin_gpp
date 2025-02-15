@@ -1,6 +1,10 @@
 #pragma once
 
 class Entity;
+namespace sf {
+	class RenderWindow;
+}
+
 class Component
 {
 protected:
@@ -15,4 +19,8 @@ public:
 	virtual void update(double dt) = 0; // Update
 	virtual void draw(sf::RenderWindow& win) = 0; // Graphics Drawing
 	virtual bool imgui() = 0; // Imgui Drawing
+
+	virtual void onGrounded(bool state) { };
+	virtual void onJumping(bool state) { };
+	virtual bool canJump() { return true; }
 };

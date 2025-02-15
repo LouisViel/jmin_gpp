@@ -4,12 +4,7 @@
 #include <iostream>
 #include <sstream>
 
-#include "SFML/Graphics.hpp"
-#include "SFML/System.hpp"
-#include "SFML/Window.hpp"
-
 class World;
-
 class MapEditor
 {
 public:
