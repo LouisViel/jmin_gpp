@@ -1,10 +1,19 @@
 #include <imgui.h>
 #include "Entity.hpp"
+#include "Component.hpp"
 #include "Game.hpp"
 #include "C.hpp"
 
-Entity::Entity(sf::Shape* _spr) : spr(_spr) {
+Entity::Entity(sf::Shape* _spr, Component** componnents) : spr(_spr)
+{
+	//this->components = std::vector<Component*>()
+}
 
+Entity::~Entity()
+{
+	delete spr;
+	for (Component* c : components) delete c;
+	components.clear();
 }
 
 
@@ -15,6 +24,10 @@ Entity::Entity(sf::Shape* _spr) : spr(_spr) {
 
 void Entity::preupdate(double dt)
 {
+	for (Component* c : components) c->preupdate(dt);
+	
+	// TODO : Move things below to PlayerController
+
 	// Update Coyotee Timer
 	if (!isGrounded && coyoteeTime > 0.0f) {
 		coyoteeTime -= dt;
@@ -28,25 +41,13 @@ void Entity::preupdate(double dt)
 
 void Entity::fixed(double fdt)
 {
-	Game& g = *Game::singleton;
-	double rate = 1.0 / fdt; // How many times in 1 second (1 second / deltatime)
-	double dfr = C::F_REF / rate; // Normalize rate from framerate
-
-	float frxdfr = isGrounded ? dfr * C::E_FR_GROUND : dfr;
-	setDy(dy + C::G * gravy * fdt); // Apply Gravity
-	dx *= pow(frx, frxdfr); // Apply Friction x
-	dy *= pow(fry, dfr); // Apply Friction y
-
-	float _rx = rx + dx * fdt; // Calculate internal movement x
-	float _ry = ry + dy * fdt; // Calculate internal movement y
-	processHorizontal(g, _rx, _ry);
-	processVertical(g, _rx, _ry);
-	rx = _rx;
-	ry = _ry;
+	for (Component* c : components) c->fixed(fdt);
+	processMovement(fdt);
 }
 
 void Entity::update(double dt)
 {
+	for (Component* c : components) c->update(dt);
 	syncPos();
 }
 
@@ -109,6 +110,25 @@ bool Entity::imgui()
 //////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
 
+
+inline void Entity::processMovement(double fdt)
+{
+	Game& g = *Game::singleton;
+	double rate = 1.0 / fdt; // How many times in 1 second (1 second / deltatime)
+	double dfr = C::F_REF / rate; // Normalize rate from framerate
+
+	float frxdfr = isGrounded ? dfr * C::E_FR_GROUND : dfr;
+	setDy(dy + C::G * gravy * fdt); // Apply Gravity
+	dx *= pow(frx, frxdfr); // Apply Friction x
+	dy *= pow(fry, dfr); // Apply Friction y
+
+	float _rx = rx + dx * fdt; // Calculate internal movement x
+	float _ry = ry + dy * fdt; // Calculate internal movement y
+	processHorizontal(g, _rx, _ry);
+	processVertical(g, _rx, _ry);
+	rx = _rx;
+	ry = _ry;
+}
 
 void Entity::processHorizontal(Game& g, float& _rx, const float& _ry)
 {

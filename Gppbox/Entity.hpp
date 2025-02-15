@@ -1,14 +1,17 @@
 #pragma once
 
+#include <vector>
 #include <SFML/Graphics.hpp>
 
 class Game;
+class Component;
 namespace sf {
 	class RenderWindow;
 }
 
-class Entity{
+class Entity {
 public:
+	std::vector<Component*> components;
 	sf::Shape* spr = nullptr; // Pointeur vers le sprite lié
 	float sheight = 0.0f; // Sprite height (center at bottom)
 	float swidth = 0.0f; // Sprite width (center at middle)
@@ -35,6 +38,7 @@ public:
 
 
 	Entity(sf::Shape* spr); // Entity Constructor
+	~Entity();
 
 	void preupdate(double dt); // Pre Update Entity
 	void fixed(double fdt); // Fixed Update Entity
@@ -42,6 +46,7 @@ public:
 	void draw(sf::RenderWindow& win); // Graphics Drawing
 	bool imgui(); // Imgui Drawing
 	
+	inline void processMovement(double fdt);
 	void processHorizontal(Game& g, float& _rx, const float& _ry);
 	void processVertical(Game& g, const float& _rx, float& _ry);
 
