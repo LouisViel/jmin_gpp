@@ -18,4 +18,6 @@ public:
 private:
 	float coyoteeTime = 0.0f;
 	float jumpDelay = 0.0f;
+
+	void processInputs(double dt);
 };

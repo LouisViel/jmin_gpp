@@ -25,8 +25,6 @@ public:
 	MapEditor* mapEditor = nullptr;
 	Camera* camera = nullptr;
 
-	bool wasSpacePressed = false;
-
 	
 	~Game();
 	Game(sf::RenderWindow * win);
@@ -38,7 +36,6 @@ public:
 	void imgui();
 
 	void processEvents(sf::Event ev);
-	void processInputs(double dt);
 
 	bool isOccupied(Entity* entity) const;
 	bool isOccupied(int gridx, int gridy) const;

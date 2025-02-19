@@ -1,0 +1,9 @@
+// M.hpp
+#define NO_UPDATE(dt)
+#define FULL_CHECK(entity, condition)
+#define REMOVE_ITEM(objType, vector, obj)
+#define GET_AXIS_MULTIPLE(output, operation, values)
+
+// InputHandler.hpp
+#define getJoystickAxis(axis)
+#define isJoystickPressed(button)

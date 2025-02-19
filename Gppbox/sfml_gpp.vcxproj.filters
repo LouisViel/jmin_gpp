@@ -186,4 +186,9 @@
       <Filter>Fichiers d%27en-tête\Engine</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint">
+      <Filter>Fichiers sources\Utils</Filter>
+    </None>
+  </ItemGroup>
 </Project>

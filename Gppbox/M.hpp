@@ -2,10 +2,12 @@
 
 namespace M
 {
+	// NO_UPDATE(dt)
 	#define NO_UPDATE(dt) if (dt <= 0.0) { return; }
 
 
-	#define FULL_CHECK(entity, args) \
+	// FULL_CHECK(entity, (xpos == targetX && int(ypos) == targetY))
+	#define FULL_CHECK(entity, condition) \
 		/* Verify entity */ \
 		if (!entity) return false; \
 		\
@@ -17,7 +19,7 @@ namespace M
 		/* Process full body check */ \
 		for (float ypos = cry, ytarget = cry - entity->sheight; ypos > ytarget; --ypos) { \
 			for (int xpos = xposMin; xpos <= xposMax; ++xpos) { \
-				if (args) return true;\
+				if (condition) return true;\
 			} \
 		} \
 		\
@@ -25,9 +27,29 @@ namespace M
 		return false;
 
 
+	// REMOVE_ITEM(Entity*, entities, target)
 	#define REMOVE_ITEM(objType, vector, obj) \
 		for (int i = 0; i < vector->size(); ++i) { \
 			objType iobj = vector->operator[](i); \
 			if (iobj == obj) vector->erase(vector->begin() + i); \
+		}
+
+
+	// GET_AXIS_MULTIPLE(result.x, < 0.0f, ({ -1, 2 }))
+	#define GET_AXIS_MULTIPLE(output, operation, values) \
+		/* Initialize dynamic containers */ \
+		std::vector<float> vals = std::vector<float>values; \
+		std::vector<float> results = std::vector<float>(); \
+		\
+		/* Get & Format all valid values */ \
+		for (int i = 0; i < vals.size(); ++i) { \
+			if (vals[i] operation) { \
+				results.push_back(std::abs(vals[i])); \
+			} \
+		} \
+		\
+		/* Output final result */ \
+		if (results.size() > 0) { \
+			output = *std::max_element(results.begin(), results.end()); \
 		}
 }

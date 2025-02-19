@@ -1,4 +1,5 @@
 #include "PlayerController.hpp"
+#include "InputHandler.hpp"
 #include "Entity.hpp"
 #include "M.hpp"
 #include "C.hpp"
@@ -15,6 +16,7 @@ void PlayerController::preupdate(double dt)
 {
 	// No logistic Update
 	NO_UPDATE(dt);
+	processInputs(dt);
 
 	// Update Coyotee Timer
 	if (!entity->isGrounded && coyoteeTime > 0.0f) {
@@ -32,6 +34,28 @@ void PlayerController::fixed(double fdt) { }
 void PlayerController::update(double dt) { }
 
 void PlayerController::imgui() { }
+
+
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+
+
+void PlayerController::processInputs(double dt)
+{
+	// Check for game window Focus + Imgui not overriding it
+	if (!InputHandler::hasFocus()) return;
+
+	// Get & Apply Horizontal Movement
+	sf::Vector2f hor = InputHandler::getHorizontal();
+	if (hor.x > 0.5f) entity->setDx(entity->dx - entity->speed * dt * hor.x);
+	else if (hor.y > 0.5f) entity->setDx(entity->dx + entity->speed * dt * hor.y);
+
+	// Get & Apply Jump
+	if (InputHandler::getJump()) {
+		entity->setJumping(true);
+	}
+}
 
 
 //////////////////////////////////////////////////////////////////

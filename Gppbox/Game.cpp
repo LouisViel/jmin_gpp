@@ -55,7 +55,9 @@ void Game::preupdate(double dt)
 	double adt = mapEditor->active ? 0.0 : dt;
 
 	world->preupdate(adt);
-	processInputs(adt);
+	if (InputHandler::getDebug()) {
+		camera->addShake(0.5f, 1.0f);
+	}
 }
 
 void Game::fixed(double fdt)
@@ -133,42 +135,6 @@ void Game::processEvents(sf::Event ev)
 			environment->debug();
 			return;
 		}
-	}
-}
-
-void Game::processInputs(double dt)
-{
-	if (!InputHandler::hasFocus()) return;
-
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::F)) {
-		camera->addShake(0.5f, 1.0f);
-	}
-
-	// Process Left Movement Input
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Q)) {
-		Entity* mainChar = world->getPlayer();
-		if (mainChar) {
-			mainChar->setDx(mainChar->dx - mainChar->speed * dt);
-		}
-	}
-
-	// Process Right Movement Input
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
-		Entity* mainChar = world->getPlayer();
-		if (mainChar) {
-			mainChar->setDx(mainChar->dx + mainChar->speed * dt);
-		}
-	}
-
-	// Process Jump Input
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space)) {
-		//if (!wasSpacePressed) {
-			Entity* mainChar = world->getPlayer();
-			if (mainChar) mainChar->setJumping(true);
-			wasSpacePressed = true;
-		//}
-	} else {
-		wasSpacePressed = false;
 	}
 }
 
