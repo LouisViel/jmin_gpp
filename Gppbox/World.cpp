@@ -57,7 +57,7 @@ void World::update(double dt)
 //////////////////////////////////////////////////////////////////
 
 
-void World::draw(sf::RenderWindow& win)
+void World::draw(sf::RenderTarget& win)
 {
 	beforeParts.draw(win);
 	for (Entity* e : *entities) e->draw(win);

@@ -1,15 +1,17 @@
 #include <imgui.h>
 #include "Game.hpp"
-#include "Entity.hpp"
 #include "Utils.hpp"
 #include "M.hpp"
 #include "C.hpp"
 
+#include "Entity.hpp"
+#include "Camera.hpp"
 #include "Environment.hpp"
 #include "World.hpp"
 #include "MapEditor.hpp"
 
 #include "InputHandler.hpp"
+
 
 
 Game* Game::singleton = nullptr;
@@ -21,10 +23,14 @@ Game::Game(sf::RenderWindow* win)
 	singleton = this;
 	this->win = win;
 
+	// Create Managers
 	environment = new Environment(win);
 	world = new World(win);
 	mapEditor = new MapEditor(win, environment, world);
 	mapEditor->load();
+
+	// Create Camera
+	camera = new Camera(world, { C::C_CENTER_X, C::C_CENTER_Y }, { C::C_SIZE_X, C::C_SIZE_Y });
 }
 
 Game::~Game()
@@ -64,6 +70,7 @@ void Game::update(double dt)
 	if (!mapEditor->active) {
 		environment->update(dt);
 		world->update(dt);
+		camera->update(dt);
 	}
 }
 
@@ -75,9 +82,25 @@ void Game::update(double dt)
 
 void Game::draw(sf::RenderWindow& win)
 {
-	environment->draw(win);
-	world->draw(win);
-	mapEditor->draw(win);
+	// Get Settings
+	sf::RenderTarget* target = &win;
+	sf::View defaultView = target->getView();
+
+	// Draw World Renderings
+	environment->drawWorld(*target);
+
+	// Enable Camera Drawing
+	if (!mapEditor->active) {
+		camera->setActive(*target);
+	}
+
+	// Draw Camera Renderings
+	environment->drawCamera(*target);
+	world->draw(*target);
+	mapEditor->draw(*target);
+
+	// Set Back target view
+	target->setView(defaultView);
 }
 
 void Game::imgui()
@@ -116,6 +139,10 @@ void Game::processEvents(sf::Event ev)
 void Game::processInputs(double dt)
 {
 	if (!InputHandler::hasFocus()) return;
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::F)) {
+		camera->addShake(0.5f, 1.0f);
+	}
 
 	// Process Left Movement Input
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Q)) {

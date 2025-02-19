@@ -21,7 +21,8 @@ public:
 	void initBackground();
 
 	void update(double dt);
-	void draw(sf::RenderWindow& win);
+	void drawWorld(sf::RenderTarget& win);
+	void drawCamera(sf::RenderTarget& win);
 	void imgui();
 
 	void cacheWalls();

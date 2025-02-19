@@ -26,7 +26,7 @@ public:
 	void preupdate(double dt);
 	void fixed(double fdt);
 	void update(double dt);
-	void draw(sf::RenderWindow& win);
+	void draw(sf::RenderTarget& win);
 	void imgui();
 
 	void removeEnnemy(Entity* ennemy);

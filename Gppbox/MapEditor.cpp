@@ -147,7 +147,7 @@ void MapEditor::imgui()
 	}
 }
 
-void MapEditor::draw(sf::RenderWindow& win)
+void MapEditor::draw(sf::RenderTarget& win)
 {
 	if (!(active && valid)) return;
 	if (tileType == TileType::Wall) drawWall(win);
@@ -157,7 +157,7 @@ void MapEditor::draw(sf::RenderWindow& win)
 //////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
 
-void MapEditor::drawWall(sf::RenderWindow& win)
+void MapEditor::drawWall(sf::RenderTarget& win)
 {
 	// Draw Color coded Cursor Target
 	sf::RectangleShape rect(sf::Vector2f(C::GRID_SIZE, C::GRID_SIZE));
@@ -166,7 +166,7 @@ void MapEditor::drawWall(sf::RenderWindow& win)
 	win.draw(rect);
 }
 
-void MapEditor::drawEnnemy(sf::RenderWindow& win)
+void MapEditor::drawEnnemy(sf::RenderTarget& win)
 {
 	// Draw Color coded Ennemy Visual Target
 	if (occupied) eSpr->spr->setFillColor(sf::Color{ 0xff0000cc });

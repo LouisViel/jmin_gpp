@@ -48,7 +48,7 @@ public:
 	
 	// Processing
 	void update(double dt);
-	void draw(sf::RenderWindow& win);
+	void draw(sf::RenderTarget& win);
 	void imgui();
 
 	// Save / Load
@@ -87,6 +87,6 @@ private:
 
 	// Utils Methods
 	void isOccupied(Game* const g);
-	void drawWall(sf::RenderWindow& win);
-	void drawEnnemy(sf::RenderWindow& win);
+	void drawWall(sf::RenderTarget& win);
+	void drawEnnemy(sf::RenderTarget& win);
 };

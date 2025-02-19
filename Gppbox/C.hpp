@@ -14,6 +14,12 @@ namespace C
 	static constexpr int RES_X = 1600;
 	static constexpr int RES_Y = 900;
 
+	// Camera Constants
+	static constexpr float C_CENTER_X = RES_X / 2.0f;
+	static constexpr float C_CENTER_Y = RES_Y / 2.0f;
+	static constexpr float C_SIZE_X = RES_X / 2.5f;
+	static constexpr float C_SIZE_Y = RES_Y / 2.5f;
+
 	// Entities Constants
 	static constexpr float G = 9.81f * 11; // (positif = down, negatif = up)
 	static constexpr double E_MAX_X = 30.0f; // Max x speed

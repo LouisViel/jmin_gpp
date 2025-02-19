@@ -46,7 +46,7 @@ void Environment::update(double dt)
 //////////////////////////////////////////////////////////////////
 
 
-void Environment::draw(sf::RenderWindow& win)
+void Environment::drawWorld(sf::RenderTarget& win)
 {
 	// Draw Background
 	sf::RenderStates states = sf::RenderStates::Default;
@@ -56,7 +56,10 @@ void Environment::draw(sf::RenderWindow& win)
 	states.texture = &bgTexture;
 	sh->setUniform("texture", bgTexture);
 	win.draw(bgHandle, states);
+}
 
+void Environment::drawCamera(sf::RenderTarget& win)
+{
 	// Draw Walls
 	for (sf::RectangleShape& r : wallSprites) win.draw(r);
 }

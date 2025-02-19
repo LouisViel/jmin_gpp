@@ -9,6 +9,7 @@ class Entity;
 class Environment;
 class World;
 class MapEditor;
+class Camera;
 
 class Game {
 public:
@@ -22,6 +23,7 @@ public:
 	Environment* environment = nullptr;
 	World* world = nullptr;
 	MapEditor* mapEditor = nullptr;
+	Camera* camera = nullptr;
 
 	bool wasSpacePressed = false;
 

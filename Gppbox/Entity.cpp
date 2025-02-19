@@ -67,7 +67,7 @@ void Entity::update(double dt)
 //////////////////////////////////////////////////////////////////
 
 
-void Entity::draw(sf::RenderWindow& win)
+void Entity::draw(sf::RenderTarget& win)
 {
 	if (spr) win.draw(*spr);
 }

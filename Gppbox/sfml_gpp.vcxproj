@@ -167,6 +167,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Bloom.cpp" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="EnnemyController.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="Game.cpp" />
@@ -190,6 +191,7 @@
     <ClInclude Include="app.h" />
     <ClInclude Include="Bloom.hpp" />
     <ClInclude Include="C.hpp" />
+    <ClInclude Include="Camera.hpp" />
     <ClInclude Include="Component.hpp" />
     <ClInclude Include="Dice.hpp" />
     <ClInclude Include="EnnemyController.hpp" />
@@ -210,6 +212,7 @@
     <ClInclude Include="boost.hpp" />
     <ClInclude Include="sys.hpp" />
     <ClInclude Include="Environment.hpp" />
+    <ClInclude Include="Throttle.hpp" />
     <ClInclude Include="Utils.hpp" />
     <ClInclude Include="World.hpp" />
   </ItemGroup>

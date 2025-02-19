@@ -46,7 +46,7 @@ public:
 	void preupdate(double dt); // Pre Update Entity
 	void fixed(double fdt); // Fixed Update Entity
 	void update(double dt); // Update Entity
-	void draw(sf::RenderWindow& win); // Graphics Drawing
+	void draw(sf::RenderTarget& win); // Graphics Drawing
 	void imgui(); // Imgui Drawing
 	
 	inline void processMovement(double fdt); // Process Entity Full Movement
