@@ -10,13 +10,13 @@ EnnemyController::EnnemyController(Entity* entity) : Component(entity) { }
 //////////////////////////////////////////////////////////////////
 
 
-void EnnemyController::preupdate(double dt)
+void EnnemyController::preupdate(double dt) { }
+
+void EnnemyController::fixed(double fdt)
 {
 	// Continuously update force to Ennemy
-	entity->setDx(entity->dx + direction * entity->speed * dt);
+	entity->setDx(entity->dx + direction * entity->speed * fdt);
 }
-
-void EnnemyController::fixed(double fdt) { }
 
 void EnnemyController::update(double dt)
 {
@@ -27,16 +27,7 @@ void EnnemyController::update(double dt)
 	}
 }
 
-
-//////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////
-
-
-bool EnnemyController::imgui()
-{
-	return false;
-}
+void EnnemyController::imgui() { }
 
 
 //////////////////////////////////////////////////////////////////

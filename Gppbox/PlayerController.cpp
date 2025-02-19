@@ -1,5 +1,6 @@
 #include "PlayerController.hpp"
 #include "Entity.hpp"
+#include "M.hpp"
 #include "C.hpp"
 
 PlayerController::PlayerController(Entity* entity) : Component(entity) { }
@@ -12,6 +13,9 @@ PlayerController::PlayerController(Entity* entity) : Component(entity) { }
 
 void PlayerController::preupdate(double dt)
 {
+	// No logistic Update
+	NO_UPDATE(dt);
+
 	// Update Coyotee Timer
 	if (!entity->isGrounded && coyoteeTime > 0.0f) {
 		coyoteeTime -= dt;
@@ -27,15 +31,7 @@ void PlayerController::fixed(double fdt) { }
 
 void PlayerController::update(double dt) { }
 
-
-//////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////
-
-
-void PlayerController::draw(sf::RenderWindow& win) { }
-
-bool PlayerController::imgui() { return false; }
+void PlayerController::imgui() { }
 
 
 //////////////////////////////////////////////////////////////////

@@ -19,6 +19,7 @@ namespace C
 	static constexpr double E_MAX_X = 30.0f; // Max x speed
 	static constexpr double E_MAX_Y = 49.0f; // Max y Speed
 	static constexpr float E_FR_GROUND = 1.45f; // Friction Ground multiplier
+	static constexpr float E_ADJUSTMENT_X = 0.725f; // Process Adjusment on x axis
 
 	// Sprite/Rendering Constants
 	static constexpr float S_ADJUSTMENT_X = 5.0f; // Sprite position Adjustment (axis x)

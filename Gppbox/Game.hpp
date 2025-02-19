@@ -1,17 +1,14 @@
 #pragma once
 
-#include <vector>
+#include "sys.hpp"
 #include "SFML/Graphics.hpp"
 #include "SFML/System.hpp"
 #include "SFML/Window.hpp"
 
-#include "sys.hpp"
-#include "Particle.hpp"
-#include "ParticleMan.hpp"
-
-#include "World.hpp"
-#include "Entity.hpp"
-
+class Entity;
+class Environment;
+class World;
+class MapEditor;
 
 class Game {
 public:
@@ -22,20 +19,15 @@ public:
 	sf::RenderWindow* win = nullptr;
 	bool closing = false;
 	
+	Environment* environment = nullptr;
 	World* world = nullptr;
-	std::vector<Entity*> entities;
-	ParticleMan beforeParts;
-	ParticleMan afterParts;
+	MapEditor* mapEditor = nullptr;
 
 	bool wasSpacePressed = false;
 
 	
 	~Game();
 	Game(sf::RenderWindow * win);
-
-	Entity* getPlayer();
-	void initMainChar();
-	void initEnnemies();
 
 	void preupdate(double dt);
 	void fixed(double fdt);
@@ -46,11 +38,12 @@ public:
 	void processEvents(sf::Event ev);
 	void processInputs(double dt);
 
-	bool isOccupied(int gridx, int gridy);
-	bool isPlayer(int gridx, int gridy);
-	bool isEnnemy(int gridx, int gridy);
+	bool isOccupied(Entity* entity) const;
+	bool isOccupied(int gridx, int gridy) const;
+	bool isPlayer(int gridx, int gridy) const;
+	bool isEnnemy(int gridx, int gridy) const;
 
-	bool hasCollision(float gridx, float gridy, bool checkBorder = true);
-	bool isBorderX(float gridx);
-	bool isWall(int cx, int cy);
+	bool hasCollision(float gridx, float gridy, bool checkBorder = true) const;
+	bool isBorderX(float gridx) const;
+	bool isWall(int cx, int cy) const;
 };

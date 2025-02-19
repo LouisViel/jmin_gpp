@@ -3,15 +3,24 @@
 
 #include "MapEditor.hpp"
 #include "InputHandler.hpp";
-#include "World.hpp";
+#include "Environment.hpp";
+#include "World.hpp"
 #include "Game.hpp"
+#include "Entity.hpp"
 #include "C.hpp"
 
 
-MapEditor::MapEditor(sf::RenderWindow* win, World* world)
+MapEditor::MapEditor(sf::RenderWindow* win, Environment* environment, World* world)
 {
 	this->win = win;
+	this->environment = environment;
 	this->world = world;
+	eSpr = world->initEnnemyCore(-100, -100);
+}
+
+MapEditor::~MapEditor()
+{
+	delete eSpr;
 }
 
 
@@ -24,7 +33,8 @@ void MapEditor::update(double dt)
 {
 	// Check is active and if game focused
 	if (!active) return;
-	valid = InputHandler::canUseMouse();
+	valid = InputHandler::hasFocus();
+	valid &= InputHandler::canUseMouse();
 	if (!valid) return;
 
 	// Get & Check if Mouse pos is in window 
@@ -39,15 +49,25 @@ void MapEditor::update(double dt)
 	leftButton = sf::Mouse::isButtonPressed(sf::Mouse::Left);
 	rightButton = sf::Mouse::isButtonPressed(sf::Mouse::Right);
 
+	// Sync Ennemy processing position
+	if (tileType == TileType::Ennemy) {
+		eSpr->setCooPixel(pos.x + C::E_ADJUSTMENT_X + 0.25f * C::GRID_SIZE, pos.y + 0.8f * C::GRID_SIZE);
+		eSpr->roundCoo();
+		eSpr->rx = 0.25f;
+		eSpr->ry = 0.99f;
+		eSpr->cy -= 1;
+		eSpr->syncPos();
+	}
+
 	// Check if target is occupied
 	Game* g = Game::singleton;
-	occupied = g->isOccupied(mousePos.x, mousePos.y);
+	isOccupied(g);
 
 	// Destroy Object if asked to + occupied
 	if (occupied && rightButton) {
 		if (!g->isPlayer(mousePos.x, mousePos.y)) {
 			removeAny();
-			occupied = false;
+			isOccupied(g);
 		}
 	}
 
@@ -59,22 +79,17 @@ void MapEditor::update(double dt)
 	}
 }
 
-
-//////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////
-
-
-void MapEditor::draw(sf::RenderWindow& win)
+void MapEditor::isOccupied(Game* const g)
 {
-	if (!(active && valid)) return;
-
-	// Draw Color coded Cursor Target
-	sf::RectangleShape rect(sf::Vector2f(C::GRID_SIZE, C::GRID_SIZE));
-	rect.setPosition((float)mousePos.x * C::GRID_SIZE, (float)mousePos.y * C::GRID_SIZE);
-	rect.setFillColor(sf::Color(occupied ? sf::Color::Red : sf::Color::Green));
-	win.draw(rect);
+	if (tileType == TileType::Wall) occupied = g->isOccupied(mousePos.x, mousePos.y);
+	else if (tileType == TileType::Ennemy) occupied = g->isOccupied(eSpr);
 }
+
+
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+
 
 void MapEditor::imgui()
 {
@@ -101,7 +116,7 @@ void MapEditor::imgui()
 
 		// Show only in edit mode
 		if (active) {
-			
+
 			// Tile Place type
 			constexpr int typeSize = 2;
 			static const char* tileTypes[typeSize]{ "Wall", "Ennemy" };
@@ -112,11 +127,50 @@ void MapEditor::imgui()
 			// Editor Hints
 			BulletText("Left click to place");
 			BulletText("Right click to remove");
+
+			Value("pcx", world->getPlayer()->cx);
+			Value("prx", world->getPlayer()->rx);
+			Value("pcy", world->getPlayer()->cy);
+			Value("pry", world->getPlayer()->ry);
+
+			Value("cx", eSpr->cx);
+			Value("rx", eSpr->rx);
+			Value("cy", eSpr->cy);
+			Value("ry", eSpr->ry);
 		}
+
+		Value("Entities", (int)world->entities->size());
 
 		Dummy(ImVec2(0.0f, 6.0f));
 		TreePop();
 	}
+}
+
+void MapEditor::draw(sf::RenderWindow& win)
+{
+	if (!(active && valid)) return;
+	if (tileType == TileType::Wall) drawWall(win);
+	else if (tileType == TileType::Ennemy) drawEnnemy(win);
+}
+
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+
+void MapEditor::drawWall(sf::RenderWindow& win)
+{
+	// Draw Color coded Cursor Target
+	sf::RectangleShape rect(sf::Vector2f(C::GRID_SIZE, C::GRID_SIZE));
+	rect.setPosition((float)mousePos.x * C::GRID_SIZE, (float)mousePos.y * C::GRID_SIZE);
+	rect.setFillColor(sf::Color(occupied ? sf::Color::Red : sf::Color::Green));
+	win.draw(rect);
+}
+
+void MapEditor::drawEnnemy(sf::RenderWindow& win)
+{
+	// Draw Color coded Ennemy Visual Target
+	if (occupied) eSpr->spr->setFillColor(sf::Color{ 0xff0000cc });
+	else eSpr->spr->setFillColor(sf::Color{ 0x00ff00cc });
+	eSpr->draw(win);
 }
 
 
@@ -173,37 +227,36 @@ void MapEditor::clearAll()
 
 void MapEditor::saveWall(ofstream& outfile)
 {
-	auto& walls = world->walls;
-	for (Vector2i w : walls) outfile << w.x << " " << w.y << "\n";
+	for (sf::Vector2i w : environment->walls)
+		outfile << w.x << " " << w.y << "\n";
 	outfile << C::SAVE_SPLIT;
 }
 
 void MapEditor::loadWall(ifstream& infile)
 {
-	auto& walls = world->walls;
-
 	int x, y;
 	std::string wallLine;
 	while (getline(infile, wallLine)) {
 		istringstream line(wallLine);
 		if (!(line >> x >> y)) break;
-		walls.push_back({ x, y });
+		environment->walls.push_back({ x, y });
 	}
-
-	world->cacheWalls();
+	environment->cacheWalls();
 }
 
 void MapEditor::clearWall()
 {
-	world->walls.clear();
-	world->cacheWalls();
+	environment->walls.clear();
+	environment->cacheWalls();
 }
 
 void MapEditor::loadWallDefault()
 {
+	using namespace sf;
+
 	int cols = C::RES_X / C::GRID_SIZE;
 	int lastLine = C::RES_Y / C::GRID_SIZE - 1;
-	auto& walls = world->walls;
+	std::vector<Vector2i>& walls = environment->walls;
 
 	for (int i = 0; i < C::RES_X / C::GRID_SIZE; ++i)
 		walls.push_back(Vector2i(i, lastLine));
@@ -227,7 +280,7 @@ void MapEditor::loadWallDefault()
 	walls.push_back(Vector2i((cols >> 2) + 2, lastLine - 4));
 	walls.push_back(Vector2i((cols >> 2) + 2, lastLine - 5));
 
-	world->cacheWalls();
+	environment->cacheWalls();
 }
 
 //////////////////////////////////////////////////////////////////
@@ -235,22 +288,37 @@ void MapEditor::loadWallDefault()
 
 void MapEditor::saveEnnemy(ofstream& outfile)
 {
-	// TODO : Implement
+	std::vector<Entity*>* entities = world->entities;
+	for (int i = 1; i < entities->size(); ++i) {
+		Entity* e = entities->operator[](i);
+		outfile << e->cx << " " << e->rx << " "
+			<< e->cy << " " << e->ry << "\n";
+	}
+	outfile << C::SAVE_SPLIT;
 }
 
 void MapEditor::loadEnnemy(ifstream& infile)
 {
-	// TODO : Implement
+	float cx, cy, rx, ry;
+	std::string wallLine;
+	while (getline(infile, wallLine)) {
+		istringstream line(wallLine);
+		if (!(line >> cx >> rx >> cy >> ry)) break;
+		world->initEnnemy(cx + rx, cy + ry);
+	}
 }
 
 void MapEditor::clearEnnemy()
 {
-	// TODO : Implement
+	std::vector<Entity*>* entities = world->entities;
+	if (entities->size() <= 1) return;
+	for (int i = entities->size() - 1; i >= 1; --i) delete entities->operator[](i);
+	entities->erase(entities->begin() + 1, entities->end());
 }
 
 void MapEditor::loadEnnemyDefault()
 {
-	// TODO : Implement
+	world->initEnnemy(7, int(C::RES_Y / C::GRID_SIZE) - 4 + 0.99f);
 }
 
 
@@ -261,13 +329,13 @@ void MapEditor::loadEnnemyDefault()
 
 void MapEditor::addWall()
 {
-	world->walls.push_back(mousePos);
-	world->cacheWalls();
+	environment->walls.push_back(mousePos);
+	environment->cacheWalls();
 }
 
 void MapEditor::addEnnemy()
 {
-	// TODO : Implement
+	world->initEnnemy(eSpr->cx + eSpr->rx, eSpr->cy + eSpr->ry);
 }
 
 //////////////////////////////////////////////////////////////////
@@ -283,7 +351,7 @@ inline void MapEditor::removeAny()
 void MapEditor::removeWall()
 {
 	// Init Variables
-	auto& walls = world->walls;
+	std::vector<sf::Vector2i>& walls = environment->walls;
 	int index = -1;
 
 	// Search for Wall Index
@@ -297,11 +365,22 @@ void MapEditor::removeWall()
 	// Erase if founded
 	if (index != -1) {
 		walls.erase(walls.begin() + index);
-		world->cacheWalls();
+		environment->cacheWalls();
 	}
 }
 
 void MapEditor::removeEnnemy()
 {
-	// TODO : Implement
+	// Get remove target ennemy
+	Entity* e = world->getEnnemy(mousePos.x, mousePos.y);
+	if (e == nullptr) return;
+
+	// Find and remove ennemy
+	std::vector<Entity*>* entities = world->entities;
+	for (int i = 1; i < entities->size(); ++i) {
+		if (entities->operator[](i) == e) {
+			entities->erase(entities->begin() + i);
+			break;
+		}
+	}
 }

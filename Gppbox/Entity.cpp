@@ -14,7 +14,7 @@ Entity::Entity(sf::Shape* _spr, Component** components, int componentCount) : sp
 
 Entity::~Entity()
 {
-	delete spr;
+	if (spr) delete spr;
 	for (Component* c : *components) delete c;
 	delete components;
 }
@@ -51,8 +51,8 @@ void Entity::preupdate(double dt)
 
 void Entity::fixed(double fdt)
 {
-	processMovement(fdt);
 	for (Component* c : *components) c->fixed(fdt);
+	processMovement(fdt);
 }
 
 void Entity::update(double dt)
@@ -72,7 +72,7 @@ void Entity::draw(sf::RenderWindow& win)
 	if (spr) win.draw(*spr);
 }
 
-bool Entity::imgui()
+void Entity::imgui()
 {
 	using namespace ImGui;
 	bool chg = false, chgCoo = false;
@@ -111,7 +111,7 @@ bool Entity::imgui()
 		setJumping(false);
 	}
 
-	return chg || chgCoo;
+	//return chg || chgCoo;
 }
 
 
@@ -319,6 +319,20 @@ void Entity::setCooGrid(float coox, float cooy)
 	syncPos();
 }
 
+void Entity::roundCoo()
+{
+	rx = std::round(rx);
+	ry = std::round(ry);
+	if (rx != 0.0f) {
+		cx += rx;
+		rx = 0.0f;
+	}
+	if (ry != 0.0f) {
+		cy += ry;
+		ry = 0.0f;
+	}
+}
+
 
 //////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
@@ -379,17 +393,17 @@ bool Entity::canJump() const
 
 void Entity::setDx(double dx)
 {
-	this->dx = clamp(dx, -C::E_MAX_X, C::E_MAX_X);
+	this->dx = std::clamp(dx, -C::E_MAX_X, C::E_MAX_X);
 }
 
 void Entity::setDy(double dy)
 {
-	this->dy = clamp(dy, -C::E_MAX_Y, C::E_MAX_Y);
+	this->dy = std::clamp(dy, -C::E_MAX_Y, C::E_MAX_Y);
 }
 
 void Entity::syncPos()
 {
-	spr->setPosition(sf::Vector2f {
+	if (spr) spr->setPosition(sf::Vector2f {
 		(cx + rx) * C::GRID_SIZE - C::S_ADJUSTMENT_X,
 		(cy + ry) * C::GRID_SIZE - C::S_ADJUSTMENT_Y
 	});

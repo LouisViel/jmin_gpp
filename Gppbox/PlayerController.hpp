@@ -9,8 +9,7 @@ public:
 	void preupdate(double dt) override;
 	void fixed(double fdt) override;
 	void update(double dt) override;
-	void draw(sf::RenderWindow& win) override;
-	bool imgui() override;
+	void imgui() override;
 
 	void onGrounded(bool state) override;
 	void onJumping(bool state) override;

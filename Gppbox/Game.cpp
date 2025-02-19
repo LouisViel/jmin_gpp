@@ -1,8 +1,16 @@
 #include <imgui.h>
 #include "Game.hpp"
-#include "PlayerController.hpp"
-#include "EnnemyController.hpp"
+#include "Entity.hpp"
+#include "Utils.hpp"
+#include "M.hpp"
 #include "C.hpp"
+
+#include "Environment.hpp"
+#include "World.hpp"
+#include "MapEditor.hpp"
+
+#include "InputHandler.hpp"
+
 
 Game* Game::singleton = nullptr;
 double Game::g_tickTimer = 0.0;
@@ -12,79 +20,18 @@ Game::Game(sf::RenderWindow* win)
 {
 	singleton = this;
 	this->win = win;
+
+	environment = new Environment(win);
 	world = new World(win);
-	initMainChar();
-	initEnnemies();
+	mapEditor = new MapEditor(win, environment, world);
+	mapEditor->load();
 }
 
 Game::~Game()
 {
+	delete environment;
 	delete world;
-	for (Entity* e : entities) delete e;
-	entities.clear();
-}
-
-Entity* Game::getPlayer()
-{
-	if (entities.size()) return entities[0];
-	return nullptr;
-}
-
-
-//////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////
-
-
-void Game::initMainChar() {
-	// Create Player Sprite
-	sf::RectangleShape* spr = new sf::RectangleShape({ C::GRID_SIZE * C::S_SCALER_X, C::GRID_SIZE * 2 * C::S_SCALER_Y });
-	spr->setFillColor(sf::Color::Magenta);
-	spr->setOutlineColor(sf::Color::Red);
-	spr->setOutlineThickness(2);
-	spr->setOrigin({ C::GRID_SIZE * 0.5f, C::GRID_SIZE * 2 });
-
-	// Create Player with "default" settings
-	Entity* e = new Entity(spr);
-	e->addComponent(new PlayerController(e));
-	e->setCooGrid(3, int(C::RES_Y / C::GRID_SIZE) - 4);
-	e->ry = 0.99f;
-	e->syncPos();
-
-	// Inject Custom Player Settings
-	e->sheight = C::P_HEIGHT;
-	e->swidth = C::P_WIDTH;
-	e->speed = C::P_SPEED;
-	e->jumpforce = C::P_JUMP;
-
-	entities.push_back(e);
-	printf("player added\n");
-}
-
-void Game::initEnnemies()
-{
-	// Create Ennemy Sprite
-	sf::RectangleShape* spr = new sf::RectangleShape({ C::GRID_SIZE * C::S_SCALER_X, C::GRID_SIZE * 2 * C::S_SCALER_Y });
-	spr->setFillColor(sf::Color::Yellow);
-	spr->setOutlineColor(sf::Color::Red);
-	spr->setOutlineThickness(2);
-	spr->setOrigin({ C::GRID_SIZE * 0.5f, C::GRID_SIZE * 2 });
-
-	// Create Ennemy with "default" settings
-	Entity* e = new Entity(spr);
-	e->addComponent(new EnnemyController(e));
-	e->setCooGrid(7, int(C::RES_Y / C::GRID_SIZE) - 4);
-	e->ry = 0.99f;
-	e->syncPos();
-
-	// Inject Custom Ennemy Settings
-	e->sheight = C::P_HEIGHT;
-	e->swidth = C::P_WIDTH;
-	e->speed = C::P_SPEED;
-	e->jumpforce = C::P_JUMP;
-
-	entities.push_back(e);
-	printf("ennemy added\n");
+	delete mapEditor;
 }
 
 
@@ -96,21 +43,28 @@ void Game::initEnnemies()
 void Game::preupdate(double dt)
 {
 	g_time += dt;
-	for (Entity* e : entities) e->preupdate(dt);
-	processInputs(dt);
+	g_tickTimer = dt;
+
+	mapEditor->update(dt);
+	double adt = mapEditor->active ? 0.0 : dt;
+
+	world->preupdate(adt);
+	processInputs(adt);
 }
 
 void Game::fixed(double fdt)
 {
-	for (Entity* e : entities) e->fixed(fdt);
+	if (!mapEditor->active) {
+		world->fixed(fdt);
+	}
 }
 
 void Game::update(double dt)
 {
-	beforeParts.update(dt);
-	world->update(dt);
-	for (Entity* e : entities) e->update(dt);
-	afterParts.update(dt);
+	if (!mapEditor->active) {
+		environment->update(dt);
+		world->update(dt);
+	}
 }
 
 
@@ -121,24 +75,16 @@ void Game::update(double dt)
 
 void Game::draw(sf::RenderWindow& win)
 {
-	// Draw Parts and Entities
-	beforeParts.draw(win);
+	environment->draw(win);
 	world->draw(win);
-	for (Entity* e : entities) e->draw(win);
-	afterParts.draw(win);
+	mapEditor->draw(win);
 }
 
- void Game::imgui()
- {
-	using namespace ImGui;
-	
-	// Show Entities for debug
-	if (CollapsingHeader("Entities")) {
-		for (Entity* e : entities) e->imgui();
-	}
-
-	// World Imgui
+void Game::imgui()
+{
+	environment->imgui();
 	world->imgui();
+	mapEditor->imgui();
 }
 
 
@@ -161,7 +107,7 @@ void Game::processEvents(sf::Event ev)
 
 		// Key [K] for walls reset debug
 		if (ev.key.code == Keyboard::K) {
-			world->debug();
+			environment->debug();
 			return;
 		}
 	}
@@ -169,9 +115,11 @@ void Game::processEvents(sf::Event ev)
 
 void Game::processInputs(double dt)
 {
+	if (!InputHandler::hasFocus()) return;
+
 	// Process Left Movement Input
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Q)) {
-		Entity* mainChar = getPlayer();
+		Entity* mainChar = world->getPlayer();
 		if (mainChar) {
 			mainChar->setDx(mainChar->dx - mainChar->speed * dt);
 		}
@@ -179,7 +127,7 @@ void Game::processInputs(double dt)
 
 	// Process Right Movement Input
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
-		Entity* mainChar = getPlayer();
+		Entity* mainChar = world->getPlayer();
 		if (mainChar) {
 			mainChar->setDx(mainChar->dx + mainChar->speed * dt);
 		}
@@ -188,7 +136,7 @@ void Game::processInputs(double dt)
 	// Process Jump Input
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space)) {
 		//if (!wasSpacePressed) {
-			Entity* mainChar = getPlayer();
+			Entity* mainChar = world->getPlayer();
 			if (mainChar) mainChar->setJumping(true);
 			wasSpacePressed = true;
 		//}
@@ -204,41 +152,29 @@ void Game::processInputs(double dt)
 
 
 // Full check for Occupied Space
-bool Game::isOccupied(int gridx, int gridy)
+bool Game::isOccupied(Entity* entity) const
 {
-	return isPlayer(gridx, gridy) ||
-		isEnnemy(gridx, gridy) ||
-		isWall(gridx, gridy);
+	FULL_CHECK(entity, this->isOccupied(xpos, ypos));
+}
+
+// Full check for Occupied Space
+bool Game::isOccupied(int gridx, int gridy) const
+{
+	return this->isPlayer(gridx, gridy) ||
+		this->isEnnemy(gridx, gridy) ||
+		this->isWall(gridx, gridy);
 }
 
 // Check is player is at coordinates
-bool Game::isPlayer(int gridx, int gridy)
+bool Game::isPlayer(int gridx, int gridy) const
 {
-	// Get Player
-	Entity* player = getPlayer();
-	if (!player) return false;
-
-	// Prepare full check Variables
-	float xposMin(player->rx - player->swidth + player->cx);
-	float xposMax(player->rx + player->swidth + 1 + player->cx);
-	float cry(player->cy + player->ry);
-
-	// Process full body check
-	for (float ypos = cry, ytarget = cry - player->sheight; ypos > ytarget; --ypos) {
-		for (float xpos = xposMin; xpos < xposMax; ++xpos) {
-			if (int(xpos) == gridx && int(ypos) == gridy) return true;
-		}
-	}
-
-	// Player was not here
-	return false;
+	return Utils::isFullBody(this->world->getPlayer(), gridx, gridy);
 }
 
 // Check if there is an ennemy at coordinates
-bool Game::isEnnemy(int gridx, int gridy)
+bool Game::isEnnemy(int gridx, int gridy) const
 {
-	// TODO : Implement
-	return false;
+	return this->world->getEnnemy(gridx, gridy) != nullptr;
 }
 
 
@@ -248,23 +184,23 @@ bool Game::isEnnemy(int gridx, int gridy)
 
 
 // Full check for Collisions at given position
-bool Game::hasCollision(float gridx, float gridy, bool checkBorder)
+bool Game::hasCollision(float gridx, float gridy, bool checkBorder) const
 {
 	if (checkBorder && isBorderX(gridx)) return true;
 	return isWall(int(gridx), int(gridy));
 }
 
 // Check if outside Border (Collision) on X axis
-bool Game::isBorderX(float gridx)
+bool Game::isBorderX(float gridx) const
 {
 	int wallRightX = (C::RES_X / C::GRID_SIZE) - 1;
 	return gridx < 1.0f || gridx >= wallRightX;
 }
 
 // Check if there is a Wall (Collision) at this position
-bool Game::isWall(int cx, int cy)
+bool Game::isWall(int cx, int cy) const
 {
-	for (Vector2i& w : world->walls) {
+	for (Vector2i& w : this->environment->walls) {
 		if (w.x == cx && w.y == cy)
 			return true;
 	}

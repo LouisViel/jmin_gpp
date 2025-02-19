@@ -47,7 +47,7 @@ public:
 	void fixed(double fdt); // Fixed Update Entity
 	void update(double dt); // Update Entity
 	void draw(sf::RenderWindow& win); // Graphics Drawing
-	bool imgui(); // Imgui Drawing
+	void imgui(); // Imgui Drawing
 	
 	inline void processMovement(double fdt); // Process Entity Full Movement
 	void processHorizontal(Game& g, float& _rx, const float& _ry); // Internal Process Movement Horizontal
@@ -55,6 +55,7 @@ public:
 
 	void setCooPixel(int px, int py); // Set Coordinate (Using Screen as referencial)
 	void setCooGrid(float coox, float cooy); // Set Coordinate (Using Grid as referencial)
+	void roundCoo(); // Round coordinates
 
 	void setGrounded(bool state); // Grounded callback
 	void setJumping(bool state); // Set Jumping state

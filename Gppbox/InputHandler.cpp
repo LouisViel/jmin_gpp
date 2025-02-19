@@ -1,10 +1,23 @@
 #include <imgui.h>
 #include "InputHandler.hpp"
+#include <SFML/Graphics.hpp>
 
-
-InputHandler::InputHandler()
+sf::RenderWindow* InputHandler::window = nullptr;
+void InputHandler::setWindow(sf::RenderWindow* window)
 {
-	
+	InputHandler::window = window;
+}
+
+
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+
+
+bool InputHandler::hasFocus()
+{
+	if (!window) return false;
+	return window->hasFocus();
 }
 
 

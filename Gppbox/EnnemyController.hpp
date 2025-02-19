@@ -10,7 +10,7 @@ public:
 	void fixed(double fdt) override;
 	void update(double dt) override;
 
-	bool imgui() override;
+	void imgui() override;
 	bool canJump() override;
 
 private:

@@ -15,6 +15,7 @@
 #include "Dice.hpp"
 #include "Lib.hpp"
 #include "Game.hpp"
+#include "InputHandler.hpp"
 #include "Interp.hpp"
 #include "HotReloadShader.hpp"
 #include "app.h"
@@ -60,11 +61,10 @@ int main()
 	}
 
 	ImGui::SFML::Init(window);
-
+	InputHandler::setWindow(&window);
     Game g(&window);
 
 	Vector2i winPos;
-
 	View v = window.getDefaultView();
 	Vector2f viewCenter = v.getCenter();
 
@@ -198,6 +198,7 @@ int main()
 		dts[curDts] = dt;
     }
 
+	InputHandler::setWindow(nullptr);
 	ImGui::SFML::Shutdown();
 
     return 0;
