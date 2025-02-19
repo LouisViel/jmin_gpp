@@ -12,6 +12,7 @@ class World
 {
 public:
 	std::vector<Entity*>* entities = nullptr;
+	std::vector<Entity*>* ennemies = nullptr;
 	ParticleMan beforeParts;
 	ParticleMan afterParts;
 
@@ -27,6 +28,9 @@ public:
 	void update(double dt);
 	void draw(sf::RenderWindow& win);
 	void imgui();
+
+	void removeEnnemy(Entity* ennemy);
+	void removeEntity(std::vector<Entity*>* main, std::vector<Entity*>* quick, Entity* e);
 
 	Entity* getPlayer();
 	Entity* getEnnemy(int gridx, int gridy);

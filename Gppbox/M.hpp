@@ -4,6 +4,7 @@ namespace M
 {
 	#define NO_UPDATE(dt) if (dt <= 0.0) { return; }
 
+
 	#define FULL_CHECK(entity, args) \
 		/* Verify entity */ \
 		if (!entity) return false; \
@@ -22,4 +23,11 @@ namespace M
 		\
 		/* No collision */ \
 		return false;
+
+
+	#define REMOVE_ITEM(objType, vector, obj) \
+		for (int i = 0; i < vector->size(); ++i) { \
+			objType iobj = vector->operator[](i); \
+			if (iobj == obj) vector->erase(vector->begin() + i); \
+		}
 }

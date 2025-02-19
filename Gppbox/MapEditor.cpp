@@ -7,6 +7,7 @@
 #include "World.hpp"
 #include "Game.hpp"
 #include "Entity.hpp"
+#include "M.hpp"
 #include "C.hpp"
 
 
@@ -288,9 +289,7 @@ void MapEditor::loadWallDefault()
 
 void MapEditor::saveEnnemy(ofstream& outfile)
 {
-	std::vector<Entity*>* entities = world->entities;
-	for (int i = 1; i < entities->size(); ++i) {
-		Entity* e = entities->operator[](i);
+	for (Entity* e : *world->ennemies) {
 		outfile << e->cx << " " << e->rx << " "
 			<< e->cy << " " << e->ry << "\n";
 	}
@@ -310,10 +309,9 @@ void MapEditor::loadEnnemy(ifstream& infile)
 
 void MapEditor::clearEnnemy()
 {
-	std::vector<Entity*>* entities = world->entities;
-	if (entities->size() <= 1) return;
-	for (int i = entities->size() - 1; i >= 1; --i) delete entities->operator[](i);
-	entities->erase(entities->begin() + 1, entities->end());
+	std::vector<Entity*>* ennemies = world->ennemies;
+	for (int i = ennemies->size() - 1; i >= 0; --i) world->removeEnnemy(ennemies->operator[](i));
+	ennemies->clear();
 }
 
 void MapEditor::loadEnnemyDefault()
@@ -348,39 +346,16 @@ inline void MapEditor::removeAny()
 	if (g->isEnnemy(mousePos.x, mousePos.y)) removeEnnemy();
 }
 
+
 void MapEditor::removeWall()
 {
-	// Init Variables
-	std::vector<sf::Vector2i>& walls = environment->walls;
-	int index = -1;
-
-	// Search for Wall Index
-	for (int i = 0; i < walls.size(); ++i) {
-		if (walls[i] == mousePos) {
-			index = i;
-			break;
-		}
-	}
-
-	// Erase if founded
-	if (index != -1) {
-		walls.erase(walls.begin() + index);
-		environment->cacheWalls();
-	}
+	std::vector<sf::Vector2i>* walls = &environment->walls;
+	REMOVE_ITEM(sf::Vector2i&, walls, mousePos);
+	environment->cacheWalls();
 }
 
 void MapEditor::removeEnnemy()
 {
-	// Get remove target ennemy
 	Entity* e = world->getEnnemy(mousePos.x, mousePos.y);
-	if (e == nullptr) return;
-
-	// Find and remove ennemy
-	std::vector<Entity*>* entities = world->entities;
-	for (int i = 1; i < entities->size(); ++i) {
-		if (entities->operator[](i) == e) {
-			entities->erase(entities->begin() + i);
-			break;
-		}
-	}
+	if (e != nullptr) world->removeEnnemy(e);
 }

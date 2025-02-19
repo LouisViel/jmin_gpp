@@ -128,9 +128,11 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);SFML_STATIC</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files\boost\boost_1_87_0\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MinimalRebuild>false</MinimalRebuild>
+      <AdditionalUsingDirectories>
+      </AdditionalUsingDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -188,6 +190,7 @@
     <ClInclude Include="app.h" />
     <ClInclude Include="Bloom.hpp" />
     <ClInclude Include="C.hpp" />
+    <ClInclude Include="Component.hpp" />
     <ClInclude Include="Dice.hpp" />
     <ClInclude Include="EnnemyController.hpp" />
     <ClInclude Include="Entity.hpp" />
@@ -204,6 +207,7 @@
     <ClInclude Include="Particle.hpp" />
     <ClInclude Include="ParticleMan.hpp" />
     <ClInclude Include="PlayerController.hpp" />
+    <ClInclude Include="boost.hpp" />
     <ClInclude Include="sys.hpp" />
     <ClInclude Include="Environment.hpp" />
     <ClInclude Include="Utils.hpp" />

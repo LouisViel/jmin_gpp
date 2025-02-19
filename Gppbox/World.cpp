@@ -1,6 +1,7 @@
 #include "World.hpp"
 #include "Entity.hpp"
 #include "Utils.hpp"
+#include "M.hpp"
 #include "C.hpp"
 
 #include "PlayerController.hpp"
@@ -15,6 +16,7 @@
 World::World(sf::RenderWindow* win)
 {
 	entities = new std::vector<Entity*>();
+	ennemies = new std::vector<Entity*>();
 	initMainChar();
 }
 
@@ -22,6 +24,7 @@ World::~World()
 {
 	for (Entity* e : *entities) delete e;
 	delete entities;
+	delete ennemies;
 }
 
 
@@ -101,6 +104,7 @@ Entity* World::initEnnemy(float x, float y)
 	Entity* e = initEnnemyCore(x, y);
 	e->addComponent(new EnnemyController(e));
 	entities->push_back(e);
+	ennemies->push_back(e);
 	return e;
 }
 
@@ -133,6 +137,24 @@ Entity* World::initEnnemyCore(float x, float y)
 //////////////////////////////////////////////////////////////////
 
 
+void World::removeEnnemy(Entity* ennemy)
+{
+	this->removeEntity(this->entities, this->ennemies, ennemy);
+}
+
+void World::removeEntity(std::vector<Entity*>* main, std::vector<Entity*>* quick, Entity* entity)
+{
+	REMOVE_ITEM(Entity*, quick, entity);
+	REMOVE_ITEM(Entity*, main, entity);
+	delete entity;
+}
+
+
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+
+
 Entity* World::getPlayer()
 {
 	if (entities->size()) return entities->operator[](0);
@@ -141,8 +163,7 @@ Entity* World::getPlayer()
 
 Entity* World::getEnnemy(int gridx, int gridy)
 {
-	for (int i = 1, target = entities->size(); i < target; ++i) {
-		Entity* e = entities->operator[](i);
+	for (Entity* e : *ennemies) {
 		if (Utils::isFullBody(e, gridx, gridy)) return e;
 	}
 	return nullptr;
