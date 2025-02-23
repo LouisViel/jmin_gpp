@@ -57,6 +57,7 @@ void World::update(double dt)
 
 void World::processDelete()
 {
+	if (toDelete.size() <= 0) return;
 	std::unordered_set<Entity*> cdelete = toDelete;
 	toDelete.clear();
 	for (Entity* e : cdelete) {
