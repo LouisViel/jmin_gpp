@@ -46,7 +46,7 @@ void Rifle::update(double dt)
 	// Perform Shoot
 	delay = 0.15f;
 	shootBullet();
-	shootEffect(dt);
+	shootEffect();
 }
 
 void Rifle::draw(sf::RenderTarget& win)
@@ -97,18 +97,9 @@ void Rifle::shootBullet()
 	world->entities->push_back(bullet);
 }
 
-void Rifle::shootEffect(double dt)
+void Rifle::shootEffect()
 {
 	Game::singleton->camera->addShake(0.4f, 0.35f);
+	controller->addRecoil(10.0f);
 	muzzleDelay = 0.3f;
 }
-
-
-//////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////
-
-
-void Rifle::shoot() { }
-
-void Rifle::cancel() { }

@@ -20,10 +20,7 @@ public:
 	void update(double dt) override;
 	void draw(sf::RenderTarget& win) override;
 
-	void shoot() override;
-	void cancel() override;
-
 private:
 	void shootBullet();
-	void shootEffect(double dt);
+	void shootEffect();
 };

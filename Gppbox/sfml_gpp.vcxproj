@@ -169,6 +169,7 @@
     <ClCompile Include="Bloom.cpp" />
     <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="DeathRay.cpp" />
     <ClCompile Include="EnnemyController.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="Game.cpp" />
@@ -193,10 +194,12 @@
   <ItemGroup>
     <ClInclude Include="app.h" />
     <ClInclude Include="Bloom.hpp" />
+    <ClInclude Include="bresenham.hpp" />
     <ClInclude Include="Bullet.hpp" />
     <ClInclude Include="C.hpp" />
     <ClInclude Include="Camera.hpp" />
     <ClInclude Include="Component.hpp" />
+    <ClInclude Include="DeathRay.hpp" />
     <ClInclude Include="Dice.hpp" />
     <ClInclude Include="EnnemyController.hpp" />
     <ClInclude Include="Entity.hpp" />

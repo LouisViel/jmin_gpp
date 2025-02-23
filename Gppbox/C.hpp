@@ -6,8 +6,8 @@ namespace C
 	static constexpr float F_REF = 60.0f; // Framerate Processing Reference
 	static constexpr double F_FIXED = 1.0f / 50.0f; // Framerate for Fixed Update
 	static constexpr float F_TARGET = 60.0f; // 60.0f // App Target Framerate
-	static constexpr std::string_view SAVE_FILE = "gamemap.save";
-	static constexpr std::string_view SAVE_SPLIT = "--\n";
+	#define SAVE_FILE "gamemap.save"
+	#define SAVE_SPLIT "--\n"
 
 	// Game Constants
 	static constexpr int GRID_SIZE = 16;

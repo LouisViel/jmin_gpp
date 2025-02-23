@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <set>
 #include <unordered_set>
 #include "ParticleMan.hpp"
 #include "M.hpp"
@@ -53,4 +54,5 @@ public:
 
 	Entity* getPlayer();
 	Entity* getEnnemy(int gridx, int gridy);
+	std::set<Entity*> getEnnemies(int gridx, int gridy);
 };

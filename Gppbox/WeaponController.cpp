@@ -1,6 +1,7 @@
 #include "WeaponController.hpp"
 #include "InputHandler.hpp";
 #include "Weapon.hpp"
+#include "Entity.hpp"
 #include "M.hpp"
 
 WeaponController::WeaponController(Entity* entity) : Component(entity)
@@ -118,6 +119,22 @@ void WeaponController::imgui()
 //////////////////////////////////////////////////////////////////
 
 
+void WeaponController::addRecoil(float force)
+{
+	addRecoil(sf::Vector2f{ -0.5f, 0.3f }, force);
+}
+
+void WeaponController::addRecoil(sf::Vector2f dir, float force)
+{
+	dir *= force;
+	dir.x *= entity->dirx;
+	entity->setDx(entity->dx + dir.x);
+	entity->setDy(entity->dy + dir.y);
+}
+
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+
 void WeaponController::secureWeapon()
 {
 	int wsize = weapons->size();
@@ -125,3 +142,4 @@ void WeaponController::secureWeapon()
 		currentWeapon %= wsize;
 	}
 }
+

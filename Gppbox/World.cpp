@@ -7,7 +7,9 @@
 #include "EnnemyController.hpp"
 #include "PlayerController.hpp"
 #include "WeaponController.hpp"
+
 #include "Rifle.hpp"
+#include "DeathRay.hpp"
 
 
 //////////////////////////////////////////////////////////////////
@@ -105,6 +107,7 @@ void World::initMainChar() {
 	// Add weapons to player
 	WeaponController* wc = new WeaponController(e);
 	wc->addWeapon(new Rifle(e, wc));
+	wc->addWeapon(new DeathRay(e, wc));
 	e->addComponent(wc);
 
 	// Inject Custom Player Settings
@@ -187,4 +190,15 @@ Entity* World::getEnnemy(int gridx, int gridy)
 		if (Utils::isFullBody(e, gridx, gridy)) return e;
 	}
 	return nullptr;
+}
+
+std::set<Entity*> World::getEnnemies(int gridx, int gridy)
+{
+	std::set<Entity*> results = std::set<Entity*>();
+	for (Entity* e : *ennemies) {
+		if (Utils::isFullBody(e, gridx, gridy)) {
+			results.emplace(e);
+		}
+	}
+	return results;
 }
