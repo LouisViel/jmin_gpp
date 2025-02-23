@@ -43,4 +43,8 @@ namespace C
 	static constexpr float P_JUMP_TOL = 0.0f; // Jump tolerance when falling
 	static constexpr float P_COYOTEE = 0.3f; // Jump coyotee tolerance
 	static constexpr float P_JUMPD = 0.075f; // Jump delay between grounded and new jump
+
+	// Life Constants
+	static constexpr float P_LIFEPOINTS = 100.0f;
+	static constexpr float E_LIFEPOINTS = 50.0f;
 }

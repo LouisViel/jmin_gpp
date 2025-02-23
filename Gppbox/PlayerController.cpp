@@ -50,6 +50,7 @@ void PlayerController::processInputs(double dt)
 	sf::Vector2f hor = InputHandler::getHorizontal();
 	if (hor.x > 0.5f) entity->setDx(entity->dx - entity->speed * dt * hor.x);
 	else if (hor.y > 0.5f) entity->setDx(entity->dx + entity->speed * dt * hor.y);
+	if (entity->dx != 0.0f) entity->dirx = entity->dx < 0.0f ? -1 : 1;
 
 	// Get & Apply Jump
 	if (InputHandler::getJump()) {

@@ -74,6 +74,7 @@ void Game::update(double dt)
 		world->update(dt);
 		camera->update(dt);
 	}
+	world->processDelete();
 }
 
 
@@ -188,6 +189,13 @@ bool Game::isBorderX(float gridx) const
 {
 	int wallRightX = (C::RES_X / C::GRID_SIZE) - 1;
 	return gridx < 1.0f || gridx >= wallRightX;
+}
+
+// Check if outside Border (Collision) on Y axis
+bool Game::isBorderY(float gridy) const
+{
+	int wallRightY = (C::RES_Y / C::GRID_SIZE) - 1;
+	return gridy < 1.0f || gridy >= wallRightY;
 }
 
 // Check if there is a Wall (Collision) at this position

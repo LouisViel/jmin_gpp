@@ -52,4 +52,32 @@ namespace M
 		if (results.size() > 0) { \
 			output = *std::max_element(results.begin(), results.end()); \
 		}
+
+
+	// Loop Forward on vector
+	// LOOPF_PTR(entities, Entity*)
+	#define LOOPF(vector, obj) \
+		for (int i = 0; i < vector.size(); ++i) { \
+			obj = vector[i];
+
+	// Loop Backward on vector
+	// LOOPF_PTR(entities, Entity*)
+	#define LOOPB(vector, obj) \
+		for (int i = vector.size() - 1; i >= 0; --i) { \
+			obj = vector[i];
+
+	// Loop Forward on pointer vector
+	// LOOPF_PTR(entities, Entity*)
+	#define LOOPF_PTR(vector, obj) \
+		for (int i = 0; i < vector->size(); ++i) { \
+			obj = vector->operator[](i);
+
+	// Loop Backward on pointer vector
+	// LOOPF_PTR(entities, Entity*)
+	#define LOOPB_PTR(vector, obj) \
+		for (int i = vector->size() - 1; i >= 0; --i) { \
+			obj = vector->operator[](i);
+
+	// LOOP_END;
+	#define LOOP_END }
 }

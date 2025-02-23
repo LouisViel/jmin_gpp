@@ -44,5 +44,6 @@ public:
 
 	bool hasCollision(float gridx, float gridy, bool checkBorder = true) const;
 	bool isBorderX(float gridx) const;
+	bool isBorderY(float gridy) const;
 	bool isWall(int cx, int cy) const;
 };

@@ -4,8 +4,10 @@
 #include "M.hpp"
 #include "C.hpp"
 
-#include "PlayerController.hpp"
 #include "EnnemyController.hpp"
+#include "PlayerController.hpp"
+#include "WeaponController.hpp"
+#include "Rifle.hpp"
 
 
 //////////////////////////////////////////////////////////////////
@@ -35,20 +37,30 @@ World::~World()
 
 void World::preupdate(double dt)
 {
-	for (Entity* e : *entities) e->preupdate(dt);
+	LOOPF_E(e->preupdate(dt));
 }
 
 void World::fixed(double fdt)
 {
-	for (Entity* e : *entities) e->fixed(fdt);
+	LOOPF_E(e->fixed(fdt));
 }
 
 
 void World::update(double dt)
 {
 	beforeParts.update(dt);
-	for (Entity* e : *entities) e->update(dt);
+	LOOPF_E(e->update(dt));
 	afterParts.update(dt);
+}
+
+void World::processDelete()
+{
+	std::unordered_set<Entity*> cdelete = toDelete;
+	toDelete.clear();
+	for (Entity* e : cdelete) {
+		REMOVE_ITEM(Entity*, entities, e);
+		delete e;
+	}
 }
 
 
@@ -60,13 +72,14 @@ void World::update(double dt)
 void World::draw(sf::RenderTarget& win)
 {
 	beforeParts.draw(win);
-	for (Entity* e : *entities) e->draw(win);
+	LOOPF_E(e->draw(win));
 	afterParts.draw(win);
 }
 
 void World::imgui()
 {
-	return;
+	return; // Only for debug
+	LOOPF_E(e->imgui());
 }
 
 
@@ -89,11 +102,18 @@ void World::initMainChar() {
 	e->setCooGrid(3, int(C::RES_Y / C::GRID_SIZE) - 4 + 0.99f);
 	e->syncPos();
 
+	// Add weapons to player
+	WeaponController* wc = new WeaponController(e);
+	wc->addWeapon(new Rifle(e, wc));
+	e->addComponent(wc);
+
 	// Inject Custom Player Settings
 	e->sheight = C::P_HEIGHT;
 	e->swidth = C::P_WIDTH;
+	e->lifepoints = C::P_LIFEPOINTS;
 	e->speed = C::P_SPEED;
 	e->jumpforce = C::P_JUMP;
+	e->dirx = 1;
 
 	entities->push_back(e);
 	printf("player added\n");
@@ -125,6 +145,7 @@ Entity* World::initEnnemyCore(float x, float y)
 	// Inject Custom Ennemy Settings
 	e->sheight = C::P_HEIGHT;
 	e->swidth = C::P_WIDTH;
+	e->lifepoints = C::E_LIFEPOINTS;
 	e->speed = C::P_SPEED;
 	e->jumpforce = C::P_JUMP;
 
@@ -139,14 +160,13 @@ Entity* World::initEnnemyCore(float x, float y)
 
 void World::removeEnnemy(Entity* ennemy)
 {
-	this->removeEntity(this->entities, this->ennemies, ennemy);
+	this->removeEntity(this->ennemies, ennemy);
 }
 
-void World::removeEntity(std::vector<Entity*>* main, std::vector<Entity*>* quick, Entity* entity)
+void World::removeEntity(std::vector<Entity*>* quick, Entity* entity)
 {
-	REMOVE_ITEM(Entity*, quick, entity);
-	REMOVE_ITEM(Entity*, main, entity);
-	delete entity;
+	if (quick != nullptr) { REMOVE_ITEM(Entity*, quick, entity); }
+	toDelete.emplace(entity);
 }
 
 

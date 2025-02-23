@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -167,6 +167,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Bloom.cpp" />
+    <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="EnnemyController.cpp" />
     <ClCompile Include="Entity.cpp" />
@@ -182,14 +183,17 @@
     <ClCompile Include="MapEditor.cpp" />
     <ClCompile Include="Particle.cpp" />
     <ClCompile Include="PlayerController.cpp" />
+    <ClCompile Include="Rifle.cpp" />
     <ClCompile Include="sys.cpp" />
     <ClCompile Include="Environment.cpp" />
     <ClCompile Include="Utils.cpp" />
+    <ClCompile Include="WeaponController.cpp" />
     <ClCompile Include="World.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="app.h" />
     <ClInclude Include="Bloom.hpp" />
+    <ClInclude Include="Bullet.hpp" />
     <ClInclude Include="C.hpp" />
     <ClInclude Include="Camera.hpp" />
     <ClInclude Include="Component.hpp" />
@@ -210,10 +214,14 @@
     <ClInclude Include="ParticleMan.hpp" />
     <ClInclude Include="PlayerController.hpp" />
     <ClInclude Include="boost.hpp" />
+    <ClInclude Include="Rifle.hpp" />
     <ClInclude Include="sys.hpp" />
     <ClInclude Include="Environment.hpp" />
     <ClInclude Include="Throttle.hpp" />
+    <ClInclude Include="Tween.hpp" />
     <ClInclude Include="Utils.hpp" />
+    <ClInclude Include="Weapon.hpp" />
+    <ClInclude Include="WeaponController.hpp" />
     <ClInclude Include="World.hpp" />
   </ItemGroup>
   <ItemGroup>

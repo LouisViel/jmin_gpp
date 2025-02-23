@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <SFML/Graphics.hpp>
+#include "M.hpp"
 
 class Game;
 class Component;
@@ -10,11 +11,25 @@ namespace sf {
 }
 
 class Entity {
+private:
+	// Loop Forward on components
+	#define LOOPF_C(action) \
+		LOOPF_PTR(components, Component* c) \
+		action; \
+		LOOP_END
+
+	// Loop Backward on components
+	#define LOOPB_C(action) \
+		LOOPB_PTR(components, Component* c) \
+		action; \
+		LOOP_END
+
 public:
 	std::vector<Component*>* components = nullptr;
 	sf::Shape* spr = nullptr; // Pointeur vers le sprite lié
 	float sheight = 0.0f; // Sprite height (center at bottom)
 	float swidth = 0.0f; // Sprite width (center at middle)
+	float lifepoints = 0.0f; // 0.0f = invulnerable
 
 	int	cx = 0; // Position "case" en x
 	int	cy = 0; // Position "case" en y
@@ -30,10 +45,12 @@ public:
 
 	float speed = 1.0f; // Move Speed (x axis)
 	float jumpforce = 10.0f; // Jump Force (y axis)
+	bool usePhysics = true; // Do use physics
 
 	bool isJumping = false; // Is Entity Jumping
 	bool isGrounded = false; // Is Entity Grounded
 	int hcollision = 0; // Horizontal Collision : -1 = left, 0 = none, 1 = right
+	int dirx = -1; // -1 = left, 1 = right
 
 
 	Entity(sf::Shape* spr); // Entity Constructor, no components

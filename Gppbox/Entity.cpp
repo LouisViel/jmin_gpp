@@ -15,7 +15,7 @@ Entity::Entity(sf::Shape* _spr, Component** components, int componentCount) : sp
 Entity::~Entity()
 {
 	if (spr) delete spr;
-	for (Component* c : *components) delete c;
+	LOOPF_C(delete c);
 	delete components;
 }
 
@@ -46,18 +46,18 @@ void Entity::addComponents(Component** components, int componentCount)
 void Entity::preupdate(double dt)
 {
 	hcollision = 0; // Reset Horizontal collision tag
-	for (Component* c : *components) c->preupdate(dt);
+	LOOPF_C(c->preupdate(dt));
 }
 
 void Entity::fixed(double fdt)
 {
-	for (Component* c : *components) c->fixed(fdt);
+	LOOPF_C(c->fixed(fdt));
 	processMovement(fdt);
 }
 
 void Entity::update(double dt)
 {
-	for (Component* c : *components) c->update(dt);
+	LOOPB_C(c->update(dt));
 	syncPos();
 }
 
@@ -70,6 +70,7 @@ void Entity::update(double dt)
 void Entity::draw(sf::RenderTarget& win)
 {
 	if (spr) win.draw(*spr);
+	LOOPF_C(c->draw(win));
 }
 
 void Entity::imgui()
@@ -111,6 +112,9 @@ void Entity::imgui()
 		setJumping(false);
 	}
 
+	// Draw components imgui
+	LOOPF_C(c->imgui());
+
 	//return chg || chgCoo;
 }
 
@@ -131,10 +135,24 @@ inline void Entity::processMovement(double fdt)
 	dx *= pow(frx, frxdfr); // Apply Friction x
 	dy *= pow(fry, dfr); // Apply Friction y
 
+	// Process raw movement
 	float _rx = rx + dx * fdt; // Calculate internal movement x
 	float _ry = ry + dy * fdt; // Calculate internal movement y
-	processHorizontal(g, _rx, _ry);
-	processVertical(g, _rx, _ry);
+
+	// Apply Physics & Collision check to results
+	if (usePhysics) {
+		processHorizontal(g, _rx, _ry);
+		processVertical(g, _rx, _ry);
+
+	// Update values without physics
+	} else {
+		float valx = std::fmod(_rx, 1.0f);
+		cx += _rx - valx; _rx = valx;
+		float valy = std::fmod(_ry, 1.0f);
+		cy += _ry - valy; _ry = valy;
+	}
+
+	// Apply final results
 	rx = _rx;
 	ry = _ry;
 }
@@ -354,7 +372,7 @@ void Entity::setGrounded(bool state)
 	}
 
 	// Call On Jumping Callbacks
-	for (Component* c : *components) c->onGrounded(isGrounded);
+	LOOPF_C(c->onGrounded(isGrounded));
 }
 
 void Entity::setJumping(bool state)
@@ -373,7 +391,7 @@ void Entity::setJumping(bool state)
 	} else return;
 
 	// Call On Jumping Callbacks
-	for (Component* c : *components) c->onJumping(isJumping);
+	LOOPF_C(c->onJumping(isJumping));
 }
 
 bool Entity::canJump() const

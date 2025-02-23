@@ -1,7 +1,9 @@
 #pragma once
 
 #include <vector>
+#include <unordered_set>
 #include "ParticleMan.hpp"
+#include "M.hpp"
 
 class Entity;
 namespace sf {
@@ -10,6 +12,22 @@ namespace sf {
 
 class World
 {
+private:
+	// Loop Forward on entities
+	#define LOOPF_E(action) \
+		LOOPF_PTR(entities, Entity* e) \
+		action; \
+		LOOP_END
+
+	// Loop Backward on entities
+	#define LOOPB_E(action) \
+		LOOPB_PTR(entities, Entity* e) \
+		action; \
+		LOOP_END
+
+	// Entity delete set (for nice cleaning)
+	std::unordered_set<Entity*> toDelete;
+
 public:
 	std::vector<Entity*>* entities = nullptr;
 	std::vector<Entity*>* ennemies = nullptr;
@@ -26,11 +44,12 @@ public:
 	void preupdate(double dt);
 	void fixed(double fdt);
 	void update(double dt);
+	void processDelete();
 	void draw(sf::RenderTarget& win);
 	void imgui();
 
 	void removeEnnemy(Entity* ennemy);
-	void removeEntity(std::vector<Entity*>* main, std::vector<Entity*>* quick, Entity* e);
+	void removeEntity(std::vector<Entity*>* quick, Entity* e);
 
 	Entity* getPlayer();
 	Entity* getEnnemy(int gridx, int gridy);

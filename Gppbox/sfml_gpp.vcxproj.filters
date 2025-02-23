@@ -22,9 +22,6 @@
     <Filter Include="Fichiers d%27en-tête\Components">
       <UniqueIdentifier>{db7e0a42-a3b2-41c0-939f-74289dba9886}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Fichiers d%27en-tête\Utils">
-      <UniqueIdentifier>{b647eb78-6916-481d-8169-4343d24d2296}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Fichiers d%27en-tête\Game">
       <UniqueIdentifier>{8becc622-1035-41b0-a204-af7f1c26d325}</UniqueIdentifier>
     </Filter>
@@ -39,6 +36,15 @@
     </Filter>
     <Filter Include="Fichiers d%27en-tête\Engine">
       <UniqueIdentifier>{d7a4c17a-fa71-4a17-bf74-0b2eecb0a2e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\Weapons">
+      <UniqueIdentifier>{81c6932e-5da5-410d-aa05-ff50251db69b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\Weapons">
+      <UniqueIdentifier>{92add35b-f833-40f9-924f-3af2df3f04a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\Utils">
+      <UniqueIdentifier>{b647eb78-6916-481d-8169-4343d24d2296}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -101,6 +107,15 @@
     </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>Fichiers sources\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="WeaponController.cpp">
+      <Filter>Fichiers sources\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Rifle.cpp">
+      <Filter>Fichiers sources\Weapons</Filter>
+    </ClCompile>
+    <ClCompile Include="Bullet.cpp">
+      <Filter>Fichiers sources\Components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -184,6 +199,21 @@
     </ClInclude>
     <ClInclude Include="Throttle.hpp">
       <Filter>Fichiers d%27en-tête\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="WeaponController.hpp">
+      <Filter>Fichiers d%27en-tête\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Tween.hpp">
+      <Filter>Fichiers d%27en-tête\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Weapon.hpp">
+      <Filter>Fichiers d%27en-tête\Weapons</Filter>
+    </ClInclude>
+    <ClInclude Include="Rifle.hpp">
+      <Filter>Fichiers d%27en-tête\Weapons</Filter>
+    </ClInclude>
+    <ClInclude Include="Bullet.hpp">
+      <Filter>Fichiers d%27en-tête\Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

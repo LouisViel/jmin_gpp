@@ -16,6 +16,7 @@ void EnnemyController::fixed(double fdt)
 {
 	// Continuously update force to Ennemy
 	entity->setDx(entity->dx + direction * entity->speed * fdt);
+	if (entity->dx != 0.0f) entity->dirx = entity->dx < 0.0f ? -1 : 1;
 }
 
 void EnnemyController::update(double dt)

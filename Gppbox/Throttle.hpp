@@ -3,6 +3,10 @@
 // used as a replacement for coroutines
 class Throttle
 {
+private:
+	float m_interval;
+	double m_elapsed;
+
 public:
 	Throttle(float interval) : m_interval(interval), m_elapsed(0) {}
 
@@ -18,8 +22,4 @@ public:
 		}
 		return false;
 	}
-
-private:
-	float m_interval;
-	double m_elapsed;
 };
