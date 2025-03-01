@@ -1,7 +1,6 @@
-#include "SFML/Graphics/RectangleShape.hpp"
-#include "SFML/Graphics/RenderTarget.hpp"
 #include "DeathRay.hpp"
-#include "bresenham.hpp"
+#include "WeaponController.hpp"
+#include "Bresenham.hpp"
 #include "Utils.hpp"
 #include "C.hpp"
 
@@ -9,7 +8,6 @@
 #include "World.hpp"
 #include "Camera.hpp"
 #include "Entity.hpp"
-#include "WeaponController.hpp"
 
 
 DeathRay::DeathRay(Entity* entity, WeaponController* controller) : Weapon(entity, controller)
@@ -69,8 +67,7 @@ void DeathRay::shootEffect()
 {
 	// Set Graphics Settings
 	sf::Vector2f dir = (target - origin);
-	if (dir.x >= 0.0f) graphics->setPosition(origin * (float)C::GRID_SIZE);
-	else graphics->setPosition((origin + dir) * (float)C::GRID_SIZE);
+	graphics->setPosition(origin * (float)C::GRID_SIZE);
 	graphics->setRotation(Utils::toAngle(dir));
 	graphics->setSize(sf::Vector2f{ Utils::toLength(dir), 0.2f } * (float)C::GRID_SIZE);
 

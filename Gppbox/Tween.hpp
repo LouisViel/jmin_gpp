@@ -68,9 +68,9 @@ T Tween<T>::Update(float dt)
 	if (m_elapsed >= m_duration) return m_to;
 
 	if (m_ease == Ease::Linear) return m_from + (m_to - m_from) * (m_elapsed / m_duration);
-	if (m_ease == Ease::InSine) return m_from + (m_to - m_from) * (1 - cos(m_elapsed / m_duration * (Lib::pi<float>() / 2)));
-	if (m_ease == Ease::OutSine) return m_from + (m_to - m_from) * sin(m_elapsed / m_duration * (Lib::pi<float>() / 2));
-	if (m_ease == Ease::InOutSine) return m_from + (m_to - m_from) * (1 - cos(m_elapsed / m_duration * Lib::pi<float>())) / 2;
+	if (m_ease == Ease::InSine) return m_from + (m_to - m_from) * (1 - cos(m_elapsed / m_duration * (M_PI / 2)));
+	if (m_ease == Ease::OutSine) return m_from + (m_to - m_from) * sin(m_elapsed / m_duration * (M_PI / 2));
+	if (m_ease == Ease::InOutSine) return m_from + (m_to - m_from) * (1 - cos(m_elapsed / m_duration * M_PI)) / 2;
 	if (m_ease == Ease::InQuad) return m_from + (m_to - m_from) * (m_elapsed / m_duration) * (m_elapsed / m_duration);
 
 	if (m_ease == Ease::OutQuad) {

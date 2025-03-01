@@ -1,11 +1,13 @@
 #include "Rifle.hpp"
+#include "WeaponController.hpp"
+#include "Bullet.hpp"
+#include "C.hpp"
+
 #include "Game.hpp"
 #include "World.hpp"
 #include "Camera.hpp"
 #include "Entity.hpp"
-#include "WeaponController.hpp"
-#include "Bullet.hpp"
-#include "C.hpp"
+
 
 Rifle::Rifle(Entity* entity, WeaponController* controller) : Weapon(entity, controller)
 {
@@ -33,18 +35,18 @@ void Rifle::update(double dt)
 
 	// Reset timer if no shooting
 	if (!controller->isShooting) {
-		delay = 0.0f;
+		cooldown = 0.0f;
 		return;
 	}
 
 	// Check for timer
-	if (delay > 0.0f) {
-		delay -= dt;
+	if (cooldown > 0.0f) {
+		cooldown -= dt;
 		return;
 	}
 
 	// Perform Shoot
-	delay = 0.15f;
+	cooldown = 0.15f;
 	shootBullet();
 	shootEffect();
 }

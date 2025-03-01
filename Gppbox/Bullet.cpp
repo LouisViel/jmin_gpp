@@ -5,6 +5,8 @@
 
 Bullet::Bullet(Entity* entity) : Component(entity) { }
 
+Bullet::Bullet(Entity* entity, float _damages) : Component(entity), damages(_damages) { }
+
 void Bullet::fixed(double fdt)
 {
 	Game* g = Game::singleton;

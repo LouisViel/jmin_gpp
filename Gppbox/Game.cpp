@@ -90,12 +90,15 @@ void Game::draw(sf::RenderWindow& win)
 	sf::View defaultView = target->getView();
 
 	// Draw World Renderings
-	environment->drawWorld(*target);
+	//environment->drawWorld(*target);
 
 	// Enable Camera Drawing
 	if (!mapEditor->active) {
 		camera->setActive(*target);
 	}
+
+	// Draw Background
+	environment->drawWorld(*target);
 
 	// Draw Camera Renderings
 	environment->drawCamera(*target);

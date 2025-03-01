@@ -55,4 +55,6 @@ public:
 	Entity* getPlayer();
 	Entity* getEnnemy(int gridx, int gridy);
 	std::set<Entity*> getEnnemies(int gridx, int gridy);
+	Entity* getClosest(std::vector<Entity*>* vector, sf::Vector2i posPix);
+	bool isValid(std::vector<Entity*>* vector, Entity* entity);
 };

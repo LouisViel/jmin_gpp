@@ -10,6 +10,7 @@
 
 #include "Rifle.hpp"
 #include "DeathRay.hpp"
+#include "MagicMissile.hpp"
 
 
 //////////////////////////////////////////////////////////////////
@@ -101,15 +102,8 @@ void World::initMainChar() {
 
 	// Create Player with "default" settings
 	Entity* e = new Entity(spr);
-	e->addComponent(new PlayerController(e));
 	e->setCooGrid(3, int(C::RES_Y / C::GRID_SIZE) - 4 + 0.99f);
 	e->syncPos();
-
-	// Add weapons to player
-	WeaponController* wc = new WeaponController(e);
-	wc->addWeapon(new Rifle(e, wc));
-	wc->addWeapon(new DeathRay(e, wc));
-	e->addComponent(wc);
 
 	// Inject Custom Player Settings
 	e->sheight = C::P_HEIGHT;
@@ -118,6 +112,16 @@ void World::initMainChar() {
 	e->speed = C::P_SPEED;
 	e->jumpforce = C::P_JUMP;
 	e->dirx = 1;
+
+	// Add components
+	e->addComponent(new PlayerController(e));
+
+	// Add weapons to player
+	WeaponController* wc = new WeaponController(e);
+	wc->addWeapon(new Rifle(e, wc));
+	wc->addWeapon(new DeathRay(e, wc));
+	wc->addWeapon(new MagicMissile(e, wc));
+	e->addComponent(wc);
 
 	entities->push_back(e);
 	printf("player added\n");
@@ -202,4 +206,31 @@ std::set<Entity*> World::getEnnemies(int gridx, int gridy)
 		}
 	}
 	return results;
+}
+
+Entity* World::getClosest(std::vector<Entity*>* vector, sf::Vector2i posPix)
+{
+	Entity* target = nullptr;
+	float distance = INFINITY;
+
+	for (Entity* e : *vector) {
+		sf::Vector2i eposPix = e->getPosPixel();
+		float dist = Utils::toLength(eposPix - posPix);
+		if (dist < distance) {
+			distance = dist;
+			target = e;
+		}
+	}
+
+	return target;
+}
+
+bool World::isValid(std::vector<Entity*>* vector, Entity* entity)
+{
+	if (entity == nullptr) return false;
+	for (Entity* e : *vector) {
+		if (e == entity)
+			return true;
+	}
+	return false;
 }

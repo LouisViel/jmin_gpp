@@ -10,7 +10,7 @@ class Rifle : public Weapon
 {
 private:
 	sf::RectangleShape* muzzle = nullptr;
-	float delay = 0.0f;
+	float cooldown = 0.0f;
 	float muzzleDelay = 0.0f;
 
 public:

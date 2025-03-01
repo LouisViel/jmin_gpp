@@ -1,10 +1,9 @@
 #pragma once
+#include "SFML/Graphics/RectangleShape.hpp"
+#include "SFML/Graphics/RenderTarget.hpp"
 
 class Entity;
 class WeaponController;
-namespace sf {
-	class RenderTarget;
-}
 
 class Weapon
 {
