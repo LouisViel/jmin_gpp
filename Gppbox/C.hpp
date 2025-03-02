@@ -38,6 +38,7 @@ namespace C
 	static constexpr float P_HEIGHT = 3.0f; // Player height
 	static constexpr float P_SPEED = 5.0f * F_REF; // Move Speed
 	static constexpr float P_JUMP = 35.0f; // Jump Force
+	static constexpr float P_DRONE = 4.5f * F_REF; // Drone Move Speed
 	
 	// Player Tolerance Settings
 	static constexpr float P_JUMP_TOL = 0.0f; // Jump tolerance when falling

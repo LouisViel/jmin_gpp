@@ -77,7 +77,6 @@ void Rifle::shootBullet()
 	// Create Bullet Sprite
 	sf::RectangleShape* spr = new sf::RectangleShape({ C::GRID_SIZE * 0.25f, C::GRID_SIZE * 0.25f });
 	spr->setFillColor(sf::Color::Red);
-	//spr->setOrigin({ C::GRID_SIZE * 0.5f, C::GRID_SIZE * 0.5f });
 
 	// Create Bullet
 	Entity* bullet = new Entity(spr);

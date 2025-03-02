@@ -39,6 +39,7 @@ public:
 	~World();
 
 	void initMainChar();
+	void initPetDrone();
 	Entity* initEnnemy(float x, float y);
 	Entity* initEnnemyCore(float x, float y);
 

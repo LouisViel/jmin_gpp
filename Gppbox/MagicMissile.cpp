@@ -63,7 +63,7 @@ void MagicMissile::shootBullets()
 	sf::Vector2i coo = entity->getPosPixel();
 	coo.y -= (entity->sheight * 0.3f) * C::GRID_SIZE;
 	shootBullet(sf::Vector2i{ int(coo.x - entity->swidth * 2), coo.y }, sf::Vector2f{ -1, 0 });
-	shootBullet(sf::Vector2i{ coo.x, int(coo.y + entity->sheight * 1.5f) }, sf::Vector2f{ 0, -1 });
+	shootBullet(sf::Vector2i{ coo.x, int(coo.y - entity->sheight * 1.5f) }, sf::Vector2f{ 0, -1 });
 	shootBullet(sf::Vector2i{ int(coo.x + entity->swidth * 2), coo.y }, sf::Vector2f{ 1, 0 });
 }
 
@@ -72,7 +72,7 @@ void MagicMissile::shootBullet(sf::Vector2i pos, sf::Vector2f dir)
 	// Create Bullet Sprite
 	sf::RectangleShape* spr = new sf::RectangleShape({ C::GRID_SIZE * 0.4f, C::GRID_SIZE * 0.4f });
 	spr->setFillColor(sf::Color::Red);
-	//spr->setOrigin({ C::GRID_SIZE * 0.5f, C::GRID_SIZE * 0.5f });
+	spr->setOrigin({ C::GRID_SIZE * 0.5f, C::GRID_SIZE * 2.0f });
 
 	// Create Bullet
 	Entity* missile = new Entity(spr);

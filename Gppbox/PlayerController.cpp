@@ -45,6 +45,7 @@ void PlayerController::processInputs(double dt)
 {
 	// Check for game window Focus + Imgui not overriding it
 	if (!InputHandler::hasFocus()) return;
+	if (!InputHandler::canUse()) return;
 
 	// Get & Apply Horizontal Movement
 	sf::Vector2f hor = InputHandler::getHorizontal();

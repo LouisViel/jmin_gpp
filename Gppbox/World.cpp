@@ -1,3 +1,4 @@
+#include "imgui.h"
 #include "World.hpp"
 #include "Entity.hpp"
 #include "Utils.hpp"
@@ -7,6 +8,7 @@
 #include "EnnemyController.hpp"
 #include "PlayerController.hpp"
 #include "WeaponController.hpp"
+#include "PetDrone.hpp"
 
 #include "Rifle.hpp"
 #include "DeathRay.hpp"
@@ -23,6 +25,7 @@ World::World(sf::RenderWindow* win)
 	entities = new std::vector<Entity*>();
 	ennemies = new std::vector<Entity*>();
 	initMainChar();
+	initPetDrone();
 }
 
 World::~World()
@@ -82,8 +85,18 @@ void World::draw(sf::RenderTarget& win)
 
 void World::imgui()
 {
-	return; // Only for debug
-	LOOPF_E(e->imgui());
+	using namespace ImGui;
+	if (TreeNodeEx("Entities", 0)) {
+		Indent(5.0f);
+		LOOPF_PTR(entities, Entity* e);
+		std::string txt = ("Entity " + std::to_string(i));
+		if (TreeNodeEx(txt.c_str())) {
+			e->imgui();
+			TreePop();
+		}
+		LOOP_END;
+		TreePop();
+	}
 }
 
 
@@ -123,8 +136,42 @@ void World::initMainChar() {
 	wc->addWeapon(new MagicMissile(e, wc));
 	e->addComponent(wc);
 
+	// Register Player
 	entities->push_back(e);
 	printf("player added\n");
+}
+
+void World::initPetDrone()
+{
+	constexpr float sizeX = 0.5f;
+	constexpr float sizeY = 0.5f;
+
+	// Create Drone Sprite
+	sf::RectangleShape* spr = new sf::RectangleShape({ C::GRID_SIZE * sizeX, C::GRID_SIZE * sizeY });
+	spr->setFillColor(sf::Color::Green);
+	spr->setOutlineColor(sf::Color::Yellow);
+	spr->setOutlineThickness(1);
+
+	// Create Drone with "default" settings
+	Entity* e = new Entity(spr);
+	e->setCooGrid(3, int(C::RES_Y / C::GRID_SIZE) - 4 + 0.99f);
+	e->syncPos();
+
+	// Inject Drone Settings
+	e->sheight = sizeX;
+	e->swidth = sizeY;
+	e->speed = C::P_DRONE;
+	e->jumpforce = C::P_DRONE;
+	e->fry = e->frx;
+	e->gravy = 0.0f;
+
+	// Add components
+	Entity* player = getPlayer();
+	e->addComponent(new PetDrone(e, player));
+
+	// Register Drone
+	entities->push_back(e);
+	printf("drone added\n");
 }
 
 Entity* World::initEnnemy(float x, float y)

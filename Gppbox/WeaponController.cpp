@@ -66,6 +66,7 @@ void WeaponController::preupdate(double dt)
 
 	// Get Inputs
 	if (!InputHandler::hasFocus()) return;
+	if (!InputHandler::canUse()) return;
 	bool shooting = InputHandler::getFire();
 	bool switching = InputHandler::getSwitch();
 
