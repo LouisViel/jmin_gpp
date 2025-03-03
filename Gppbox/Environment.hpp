@@ -12,6 +12,7 @@ public:
 	sf::RectangleShape bgHandle;
 	HotReloadShader* bgShader = nullptr;
 	sf::Texture	bgTexture;
+	sf::Texture wallTexture;
 
 	std::vector<sf::Vector2i> walls;
 	std::vector<sf::RectangleShape> wallSprites;

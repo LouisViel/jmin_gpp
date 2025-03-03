@@ -4,6 +4,8 @@
 class MagicMissile : public Weapon
 {
 private:
+	sf::Texture* weaponTexture = nullptr;
+	sf::RectangleShape* weaponHandle = nullptr;
 	float cooldown = 0.0f;
 
 public:

@@ -29,9 +29,9 @@ namespace C
 
 	// Sprite/Rendering Constants
 	static constexpr float S_ADJUSTMENT_X = 5.0f; // Sprite position Adjustment (axis x)
-	static constexpr float S_SCALER_X = 1.2f; // Sprite Scale Adjustment (axis x)
+	static constexpr float S_SCALER_X = 1.3f; // Sprite Scale Adjustment (axis x)
 	static constexpr float S_ADJUSTMENT_Y = 7.5f; // Sprite position Adjustment (axis y)
-	static constexpr float S_SCALER_Y = 1.2f; // Sprite Scale Adjustment (axis y)
+	static constexpr float S_SCALER_Y = 1.25f; // Sprite Scale Adjustment (axis y)
 
 	// Player Constants
 	static constexpr float P_WIDTH = 0.5f; // Player Width

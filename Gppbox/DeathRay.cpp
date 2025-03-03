@@ -12,13 +12,20 @@
 
 DeathRay::DeathRay(Entity* entity, WeaponController* controller) : Weapon(entity, controller)
 {
-	graphics = new sf::RectangleShape({ C::GRID_SIZE, C::GRID_SIZE });
-	graphics->setFillColor(sf::Color::Red);
+	laserGraphics = new sf::RectangleShape({ C::GRID_SIZE, C::GRID_SIZE });
+	laserGraphics->setFillColor(sf::Color::Red);
+
+	weaponTexture = new sf::Texture();
+	weaponTexture->loadFromFile("res/laser.png");
+	weaponHandle = new sf::RectangleShape({ C::GRID_SIZE * 0.75f, C::GRID_SIZE * 0.75f });
+	weaponHandle->setTexture(weaponTexture);
 }
 
 DeathRay::~DeathRay()
 {
-	delete graphics;
+	delete laserGraphics;
+	delete weaponTexture;
+	delete weaponHandle;
 }
 
 
@@ -35,8 +42,22 @@ void DeathRay::update(double dt)
 
 void DeathRay::draw(sf::RenderTarget& win)
 {
+	sf::Vector2i coo = entity->getPosPixel();
+	coo.y -= entity->sheight * C::GRID_SIZE * 0.8f;
+	coo.x += entity->swidth * 0.2f *- C::GRID_SIZE;
+	if (entity->dirx > 0) coo.x -= entity->swidth * C::GRID_SIZE * 2;
+	else coo.x += entity->swidth * C::GRID_SIZE;
+	weaponHandle->setPosition(coo.x, coo.y);
+
+	sf::Vector2f scale = weaponHandle->getScale();
+	if (Utils::sign<float>(scale.x) != Utils::sign<int>(entity->dirx)) {
+		scale.x = -scale.x;
+		weaponHandle->setScale(scale);
+	}
+
+	win.draw(*weaponHandle);
 	if (drawDelay > 0.0f) {
-		win.draw(*graphics);
+		win.draw(*laserGraphics);
 	}
 }
 
@@ -67,9 +88,9 @@ void DeathRay::shootEffect()
 {
 	// Set Graphics Settings
 	sf::Vector2f dir = (target - origin);
-	graphics->setPosition(origin * (float)C::GRID_SIZE);
-	graphics->setRotation(Utils::toAngle(dir));
-	graphics->setSize(sf::Vector2f{ Utils::toLength(dir), 0.2f } * (float)C::GRID_SIZE);
+	laserGraphics->setPosition(origin * (float)C::GRID_SIZE);
+	laserGraphics->setRotation(Utils::toAngle(dir));
+	laserGraphics->setSize(sf::Vector2f{ Utils::toLength(dir), 0.2f } * (float)C::GRID_SIZE);
 
 	// Apply feedbacks
 	Game::singleton->camera->addShake(0.5f, 0.75f);

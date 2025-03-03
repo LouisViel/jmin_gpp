@@ -8,7 +8,7 @@ class Missile : public Component
 {
 private:
 	Entity* target;
-	float notDelay = 0.5f;
+	float notDelay = 0.2f;
 	bool isValid = false;
 
 	#define transf entity->spr
@@ -17,7 +17,6 @@ private:
 	void initTarget();
 
 public:
-	float speed = 7.0f;
 	Missile(Entity* entity, float dirAngle);
 	
 	void preupdate(double dt) override;

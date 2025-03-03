@@ -181,6 +181,7 @@
     <ClCompile Include="libs\imgui\imgui_draw.cpp" />
     <ClCompile Include="libs\imgui\imgui_widgets.cpp" />
     <ClCompile Include="app.cpp" />
+    <ClCompile Include="Lifetime.cpp" />
     <ClCompile Include="MagicMissile.cpp" />
     <ClCompile Include="MapEditor.cpp" />
     <ClCompile Include="Missile.cpp" />
@@ -188,6 +189,8 @@
     <ClCompile Include="PetDrone.cpp" />
     <ClCompile Include="PlayerController.cpp" />
     <ClCompile Include="Rifle.cpp" />
+    <ClCompile Include="SpawnOnDestroy.cpp" />
+    <ClCompile Include="SpriteOverride.cpp" />
     <ClCompile Include="sys.cpp" />
     <ClCompile Include="Environment.cpp" />
     <ClCompile Include="Utils.cpp" />
@@ -214,6 +217,7 @@
     <ClInclude Include="libs\imgui-sfml\imgui-SFML.h" />
     <ClInclude Include="libs\imgui-sfml\imgui-SFML_export.h" />
     <ClInclude Include="libs\imgui\imgui.h" />
+    <ClInclude Include="Lifetime.hpp" />
     <ClInclude Include="M.hpp" />
     <ClInclude Include="MagicMissile.hpp" />
     <ClInclude Include="MapEditor.hpp" />
@@ -224,6 +228,8 @@
     <ClInclude Include="PlayerController.hpp" />
     <ClInclude Include="boost.hpp" />
     <ClInclude Include="Rifle.hpp" />
+    <ClInclude Include="SpawnOnDestroy.hpp" />
+    <ClInclude Include="SpriteOverride.hpp" />
     <ClInclude Include="sys.hpp" />
     <ClInclude Include="Environment.hpp" />
     <ClInclude Include="Throttle.hpp" />

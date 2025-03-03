@@ -30,6 +30,7 @@ public:
 	float sheight = 0.0f; // Sprite height (center at bottom)
 	float swidth = 0.0f; // Sprite width (center at middle)
 	float lifepoints = 0.0f; // 0.0f = invulnerable
+	bool defaultDraw = true; // Use Default Draw
 
 	int	cx = 0; // Position "case" en x
 	int	cy = 0; // Position "case" en y

@@ -22,7 +22,8 @@ Environment::~Environment()
 
 void Environment::initBackground()
 {
-	bool isOk = bgTexture.loadFromFile("res/bg_stars.png");
+	bool isOk = wallTexture.loadFromFile("res/wall.png");
+	isOk &= bgTexture.loadFromFile("res/bg_city.jpg");
 	if (!isOk) printf("ERR : LOAD FAILED\n");
 	bgHandle = sf::RectangleShape(sf::Vector2f((float)win->getSize().x, (float)win->getSize().y));
 	bgHandle.setTexture(&bgTexture);
@@ -94,7 +95,7 @@ void Environment::cacheWalls()
 		sf::RectangleShape rect(sf::Vector2f(C::GRID_SIZE, C::GRID_SIZE));
 		rect.setPosition((float)w.x * C::GRID_SIZE, (float)w.y * C::GRID_SIZE);
 		//rect.setFillColor(sf::Color(0x07ff07ff));
-		rect.setFillColor(sf::Color::Cyan);
+		rect.setTexture(&wallTexture);
 		wallSprites.push_back(rect);
 	}
 }

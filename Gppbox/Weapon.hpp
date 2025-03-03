@@ -4,6 +4,9 @@
 
 class Entity;
 class WeaponController;
+namespace sf {
+	class Texture;
+}
 
 class Weapon
 {
@@ -13,8 +16,8 @@ protected:
 
 public:
 	Weapon() = delete;
-	Weapon(Entity* _entity, WeaponController* _controller) : 
-		entity(_entity), controller(_controller) { }
+	Weapon(Entity* _entity, WeaponController* _controller) : entity(_entity), controller(_controller) { }
+	virtual ~Weapon() { }
 	
 	virtual void update(double dt) { }
 	virtual void draw(sf::RenderTarget& win) { }

@@ -11,12 +11,6 @@ bool Utils::isFullBody(Entity* entity, int gridx, int gridy)
     FULL_CHECK(entity, (xpos == gridx && int(ypos) == gridy));
 }
 
-template <typename T>
-int Utils::sign(T val) {
-    return (T(0) < val) - (val < T(0));
-}
-
-
 
 
 float Utils::toLength(const sf::Vector2i& source)

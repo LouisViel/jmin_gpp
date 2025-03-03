@@ -1,9 +1,6 @@
 #include "HotReloadShader.hpp"
-
 #include  <istream>
 #include  <iostream>
-
-
 #include "Lib.hpp"
 
 string HotReloadShader::getFileContent(const std::string & path) {
@@ -35,8 +32,7 @@ void HotReloadShader::tick() {
 
 	int res = stat(vertPath.c_str(), &mt);
 	if (res == -1) {
-		if (!inError)
-			std::cout << "no such vert shader" << std::endl;
+		//if (!inError) std::cout << "no such vert shader" << std::endl;
 		inError = true;
 		return;
 	}
@@ -46,14 +42,12 @@ void HotReloadShader::tick() {
 		vertSrc = getFileContent(vertPath.c_str());
 		mtimeVert = mt.st_mtime;
 		hasOneChanged = true;
-		if (vertSrc.size())
-			cout << "vert read successfully" << endl;
+		//if (vertSrc.size()) cout << "vert read successfully" << endl;
 	}
 
 	res = stat(fragPath.c_str(), &mt);
 	if (res == -1) {
-		if (!inError)
-			std::cout << "no such frag shader" << std::endl;
+		//if (!inError) std::cout << "no such frag shader" << std::endl;
 		inError = true;
 		return;
 	}
@@ -63,19 +57,17 @@ void HotReloadShader::tick() {
 		fragSrc = getFileContent(fragPath.c_str());
 		mtimeFrag = mt.st_mtime;
 		hasOneChanged = true;
-		if (fragSrc.size())
-			cout << "frag read successfully" << endl;
+		//if (fragSrc.size()) cout << "frag read successfully" << endl;
 	}
 
 	if (hasOneChanged) {
 		bool ok = sh.loadFromMemory(vertSrc.c_str(), fragSrc.c_str());
 		if (ok) {
-			cout << "shader updated" << endl;
+			//cout << "shader updated" << endl;
 			if (onUpdate)
 				onUpdate();
 		}
-		else
-			std::cout << "unable to parse shader" << std::endl;
+		//else std::cout << "unable to parse shader" << std::endl;
 	}
 }
 

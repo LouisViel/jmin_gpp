@@ -24,3 +24,8 @@ public:
 	static sf::Vector2i rotate(const sf::Vector2i& source, float angle);
 	static sf::Vector2f rotate(const sf::Vector2f& source, float angle);
 };
+
+template <typename T>
+int Utils::sign(T val) {
+	return (T(0) < val) - (val < T(0));
+}

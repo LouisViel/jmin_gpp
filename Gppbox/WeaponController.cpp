@@ -1,5 +1,5 @@
 #include "WeaponController.hpp"
-#include "InputHandler.hpp";
+#include "InputHandler.hpp"
 #include "Weapon.hpp"
 #include "Entity.hpp"
 #include "M.hpp"

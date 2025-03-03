@@ -13,6 +13,7 @@ protected:
 public:
 	Component() = delete;
 	Component(Entity* _entity) : entity(_entity) { }
+	virtual ~Component() { }
 
 	virtual void preupdate(double dt) { } // Pre Update (called even in "edit mode")
 	virtual void fixed(double fdt) { } // Fixed Update (no call in "edit mode")

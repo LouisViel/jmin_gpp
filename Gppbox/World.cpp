@@ -5,6 +5,7 @@
 #include "M.hpp"
 #include "C.hpp"
 
+#include "SpriteOverride.hpp"
 #include "EnnemyController.hpp"
 #include "PlayerController.hpp"
 #include "WeaponController.hpp"
@@ -128,6 +129,7 @@ void World::initMainChar() {
 
 	// Add components
 	e->addComponent(new PlayerController(e));
+	e->addComponent(new SpriteOverride(e, "res/player.png"));
 
 	// Add weapons to player
 	WeaponController* wc = new WeaponController(e);
@@ -147,7 +149,7 @@ void World::initPetDrone()
 	constexpr float sizeY = 0.5f;
 
 	// Create Drone Sprite
-	sf::RectangleShape* spr = new sf::RectangleShape({ C::GRID_SIZE * sizeX, C::GRID_SIZE * sizeY });
+	sf::RectangleShape* spr = new sf::RectangleShape({ C::GRID_SIZE * sizeX * 1.75f, C::GRID_SIZE * sizeY * 1.75f });
 	spr->setFillColor(sf::Color::Green);
 	spr->setOutlineColor(sf::Color::Yellow);
 	spr->setOutlineThickness(1);
@@ -166,8 +168,9 @@ void World::initPetDrone()
 	e->gravy = 0.0f;
 
 	// Add components
-	Entity* player = getPlayer();
-	e->addComponent(new PetDrone(e, player));
+	e->addComponent(new PetDrone(e, getPlayer()));
+	e->addComponent(new SpriteOverride(e, "res/drone.png"));
+	e->spr->setFillColor(sf::Color::Cyan);
 
 	// Register Drone
 	entities->push_back(e);
@@ -203,6 +206,9 @@ Entity* World::initEnnemyCore(float x, float y)
 	e->lifepoints = C::E_LIFEPOINTS;
 	e->speed = C::P_SPEED;
 	e->jumpforce = C::P_JUMP;
+
+	// Add Override Sprite
+	e->addComponent(new SpriteOverride(e, "res/ennemy.png"));
 
 	return e;
 }

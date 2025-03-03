@@ -77,12 +77,12 @@ void PetDrone::shoot(sf::Vector2f dir)
 
 	// Create Bullet Sprite
 	sf::RectangleShape* spr = new sf::RectangleShape({ C::GRID_SIZE * 0.25f, C::GRID_SIZE * 0.25f });
-	spr->setFillColor(sf::Color::Red);
+	spr->setFillColor(sf::Color::White);
 	spr->setRotation(Utils::toAngle(dir));
 
 	// Create Bullet
 	Entity* bullet = new Entity(spr);
-	bullet->addComponent(new Bullet(bullet));
+	bullet->addComponent(new Bullet(bullet, 22.5f));
 	bullet->swidth = C::GRID_SIZE * 0.25f;
 	bullet->sheight = C::GRID_SIZE * 0.25f;
 	bullet->speed = 100.0f;

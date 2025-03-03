@@ -35,6 +35,7 @@ Game::Game(sf::RenderWindow* win)
 
 Game::~Game()
 {
+	singleton = nullptr;
 	delete environment;
 	delete world;
 	delete mapEditor;

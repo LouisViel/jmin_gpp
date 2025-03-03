@@ -57,6 +57,7 @@ void Rifle::draw(sf::RenderTarget& win)
 	if (muzzleDelay > 0.0f) {
 		sf::Vector2i coo = entity->getPosPixel();
 		coo.y -= (entity->sheight * 0.3f) * C::GRID_SIZE;
+		if (entity->dirx > 0) coo.x -= entity->swidth * C::GRID_SIZE * 2;
 		muzzle->setPosition(coo.x, coo.y);
 		win.draw(*muzzle);
 	}
@@ -76,7 +77,7 @@ void Rifle::shootBullet()
 
 	// Create Bullet Sprite
 	sf::RectangleShape* spr = new sf::RectangleShape({ C::GRID_SIZE * 0.25f, C::GRID_SIZE * 0.25f });
-	spr->setFillColor(sf::Color::Red);
+	spr->setFillColor(sf::Color::White);
 
 	// Create Bullet
 	Entity* bullet = new Entity(spr);

@@ -29,7 +29,7 @@ void Missile::initTarget()
 	// Apply max distance
 	sf::Vector2i ecoo = closest->getPosPixel();
 	float distance = Utils::toLength(ecoo - coo);
-	if (distance > 20.0f * C::GRID_SIZE) return;
+	if (distance > 50.0f * C::GRID_SIZE) return;
 
 	// Register target
 	target = closest;
@@ -62,14 +62,14 @@ void Missile::fixed(double fdt)
 
 	// Apply rotation
 	sf::Vector2i dir = target->getPosPixel() - entity->getPosPixel();
-	float rot = transf->getRotation(), maxRot = C::F_FIXED * 20.0f, angle = Utils::toAngle(dir);
+	float rot = transf->getRotation(), maxRot = C::F_FIXED * 10.0f, angle = Utils::toAngle(dir);
 	float res = Tween<float>::From(rot).To(angle).For(maxRot).SetEase(Ease::Linear).Update(fdt);
 	transf->setRotation(res);
 
 	// Apply movement
 	sf::Vector2f move = Utils::fromAngle(res);
-	entity->dx = move.x * speed;
-	entity->dy = move.y * speed;
+	entity->setDx(move.x * entity->speed);
+	entity->setDy(move.y * entity->speed);
 }
 
 void Missile::update(double dt)
@@ -85,6 +85,6 @@ void Missile::update(double dt)
 void Missile::draw(sf::RenderTarget& win)
 {
 	target_invalid();
-	entity->spr->setFillColor(sf::Color::Blue);
-	entity->spr->setScale(1.5f, 1.5f);
+	//entity->spr->setFillColor(sf::Color::Blue);
+	//entity->spr->setScale(1.5f, 1.5f);
 }

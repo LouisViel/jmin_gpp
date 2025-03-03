@@ -8,7 +8,9 @@ namespace sf {
 class DeathRay : public Weapon
 {
 private:
-	sf::RectangleShape* graphics = nullptr;
+	sf::Texture* weaponTexture = nullptr;
+	sf::RectangleShape* weaponHandle = nullptr;
+	sf::RectangleShape* laserGraphics = nullptr;
 	sf::Vector2f orientation = sf::Vector2f(1.0f, 0.0f);
 	float cooldown = 0.0f;
 	float drawDelay = 0.0f;

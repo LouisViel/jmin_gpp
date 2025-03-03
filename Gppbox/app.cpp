@@ -91,8 +91,9 @@ int main()
 	destFinal->create(window.getSize().x, window.getSize().y);
 	destFinal->clear(sf::Color(0, 0, 0, 0));	
 
-	float bloomWidth = 12;
-	sf::Glsl::Vec4 bloomMul(1,1,1,0.8f);
+	//float bloomWidth = 12;
+	float bloomWidth = 8;
+	sf::Glsl::Vec4 bloomMul(89 / 255.0f, 33 / 255.0f, 33 / 255.0f, 204 / 255.0f);
 
     while (window.isOpen())
     {

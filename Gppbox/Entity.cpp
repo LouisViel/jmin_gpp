@@ -69,7 +69,7 @@ void Entity::update(double dt)
 
 void Entity::draw(sf::RenderTarget& win)
 {
-	if (spr) win.draw(*spr);
+	if (defaultDraw && spr) win.draw(*spr);
 	LOOPF_C(c->draw(win));
 }
 
