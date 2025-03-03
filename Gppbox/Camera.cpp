@@ -22,7 +22,7 @@ void Camera::update(double dt)
 
 	sf::Vector2f shake = processShake(dt);
 	float x = (player->cx + player->rx) * C::GRID_SIZE + shake.x;
-	float y = (player->cy + player->ry)* C::GRID_SIZE + shake.y;
+	float y = (player->cy + player->ry - 2.5f) * C::GRID_SIZE + shake.y;
 	m_view.setCenter(x, y);
 }
 

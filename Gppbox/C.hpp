@@ -34,7 +34,7 @@ namespace C
 	static constexpr float S_SCALER_Y = 1.25f; // Sprite Scale Adjustment (axis y)
 
 	// Player Constants
-	static constexpr float P_WIDTH = 0.5f; // Player Width
+	static constexpr float P_WIDTH = 0.35f; // Player Width
 	static constexpr float P_HEIGHT = 3.0f; // Player height
 	static constexpr float P_SPEED = 5.0f * F_REF; // Move Speed
 	static constexpr float P_JUMP = 35.0f; // Jump Force

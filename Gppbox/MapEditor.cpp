@@ -128,16 +128,6 @@ void MapEditor::imgui()
 			// Editor Hints
 			BulletText("Left click to place");
 			BulletText("Right click to remove");
-
-			Value("pcx", world->getPlayer()->cx);
-			Value("prx", world->getPlayer()->rx);
-			Value("pcy", world->getPlayer()->cy);
-			Value("pry", world->getPlayer()->ry);
-
-			Value("cx", eSpr->cx);
-			Value("rx", eSpr->rx);
-			Value("cy", eSpr->cy);
-			Value("ry", eSpr->ry);
 		}
 
 		Value("Entities", (int)world->entities->size());
